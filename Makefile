@@ -2,7 +2,7 @@ CC?=clang
 YC?=yacc
 BIN=doas
 PREFIX?=/usr/local
-OBJECTS=doas.o env.o execvpe.o reallocarr.o y.tab.o
+OBJECTS=doas.o env.o execvpe.o y.tab.o
 CFLAG+= -DUSE_PAM
 LFLAG+= -lpam
 
@@ -17,9 +17,6 @@ execvpe.o: doas.h execvpe.c
 
 doas.o: doas.h doas.c parse.y
 	$(CC) $(CFLAG) -c doas.c
-
-reallocarr.o: reallocarr.c doas.h
-	$(CC) -c reallocarr.c
 
 y.tab.o: parse.y
 	$(YC) parse.y

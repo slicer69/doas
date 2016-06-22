@@ -130,7 +130,7 @@ envlist:	/* empty */ {
 			/* if (!($$.envlist = reallocarray($1.envlist, nenv + 2,
 			    sizeof(char *))))
                         */
-                        if (!($$.envlist = realloc($1.envlist, (nenv + 2) + sizeof(char*))))
+                        if (!($$.envlist = realloc($1.envlist, (nenv + 2) * sizeof(char*))))
 				errx(1, "can't allocate envlist");
 			$$.envlist[nenv] = $2.str;
 			$$.envlist[nenv + 1] = NULL;
