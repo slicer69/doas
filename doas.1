@@ -1,0 +1,109 @@
+.\" $OpenBSD: doas.1,v 1.16 2016/06/11 04:38:21 tedu Exp $
+.\"
+.\"Copyright (c) 2015 Ted Unangst <tedu@openbsd.org>
+.\"
+.\"Permission to use, copy, modify, and distribute this software for any
+.\"purpose with or without fee is hereby granted, provided that the above
+.\"copyright notice and this permission notice appear in all copies.
+.\"
+.\"THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\"WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\"MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\"ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\"WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\"ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\"OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.Dd $Mdocdate: June 11 2016 $
+.Dt DOAS 1
+.Os
+.Sh NAME
+.Nm doas
+.Nd execute commands as another user
+.Sh SYNOPSIS
+.Nm doas
+.Op Fl ns
+.Op Fl a Ar style
+.Op Fl C Ar config
+.Op Fl u Ar user
+.Ar command
+.Op Ar args
+.Sh DESCRIPTION
+The
+.Nm
+utility executes the given command as another user.
+The
+.Ar command
+argument is mandatory unless
+.Fl C
+or
+.Fl s
+is specified.
+.Pp
+The options are as follows:
+.Bl -tag -width tenletters
+.It Fl a Ar style
+Use the specified authentication style when validating the user,
+as allowed by
+.Pa /etc/login.conf .
+A list of doas-specific authentication methods may be configured by adding an
+.Sq auth-doas
+entry in
+.Xr login.conf 5 .
+.It Fl C Ar config
+Parse and check the configuration file
+.Ar config ,
+then exit.
+If
+.Ar command
+is supplied,
+.Nm
+will also perform command matching.
+In the latter case
+either
+.Sq permit ,
+.Sq permit nopass
+or
+.Sq deny
+will be printed on standard output, depending on command
+matching results.
+No command is executed.
+.It Fl n
+Non interactive mode, fail if
+.Nm
+would prompt for password.
+.It Fl s
+Execute the shell from
+.Ev SHELL
+or
+.Pa /etc/passwd .
+.It Fl u Ar user
+Execute the command as
+.Ar user .
+The default is root.
+.El
+.Sh EXIT STATUS
+.Ex -std doas
+It may fail for one of the following reasons:
+.Pp
+.Bl -bullet -compact
+.It
+The config file
+.Pa /etc/doas.conf
+could not be parsed.
+.It
+The user attempted to run a command which is not permitted.
+.It
+The password was incorrect.
+.It
+The specified command was not found or is not executable.
+.El
+.Sh SEE ALSO
+.Xr su 1 ,
+.Xr doas.conf 5
+.Sh HISTORY
+The
+.Nm
+command first appeared in
+.Ox 5.8 .
+.Sh AUTHORS
+.An Ted Unangst Aq Mt tedu@openbsd.org
