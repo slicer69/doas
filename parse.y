@@ -84,8 +84,10 @@ rule:		action ident target cmd {
 					maxrules = 63;
 				else
 					maxrules *= 2;
-				if (!(rules = reallocarray(rules, maxrules,
+				/* if (!(rules = reallocarray(rules, maxrules,
 				    sizeof(*rules))))
+                                */
+                                if (!(rules = realloc(rules, maxrules * sizeof(*rules))))
 					errx(1, "can't allocate rules");
 			}
 			rules[nrules++] = r;
@@ -125,8 +127,10 @@ envlist:	/* empty */ {
 				errx(1, "can't allocate envlist");
 		} | envlist TSTRING {
 			int nenv = arraylen($1.envlist);
-			if (!($$.envlist = reallocarray($1.envlist, nenv + 2,
+			/* if (!($$.envlist = reallocarray($1.envlist, nenv + 2,
 			    sizeof(char *))))
+                        */
+                        if (!($$.envlist = realloc($1.envlist, (nenv + 2) + sizeof(char*))))
 				errx(1, "can't allocate envlist");
 			$$.envlist[nenv] = $2.str;
 			$$.envlist[nenv + 1] = NULL;
@@ -162,8 +166,10 @@ argslist:	/* empty */ {
 				errx(1, "can't allocate args");
 		} | argslist TSTRING {
 			int nargs = arraylen($1.cmdargs);
-			if (!($$.cmdargs = reallocarray($1.cmdargs, nargs + 2,
+			/* if (!($$.cmdargs = reallocarray($1.cmdargs, nargs + 2,
 			    sizeof(char *))))
+                        */
+                         if (!($$.cmdargs = realloc($1.cmdargs, (nargs + 2) * sizeof(char *))))
 				errx(1, "can't allocate args");
 			$$.cmdargs[nargs] = $2.str;
 			$$.cmdargs[nargs + 1] = NULL;

@@ -18,9 +18,15 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#if defined(HAVE_INTTYPES_H)
+#include <inttypes.h>
+#endif
+
 #include <limits.h>
+/*
 #include <login_cap.h>
 #include <bsd_auth.h>
+*/
 #include <readpassphrase.h>
 #include <string.h>
 #include <stdio.h>
@@ -32,9 +38,24 @@
 #include <syslog.h>
 #include <errno.h>
 
+#if defined(HAVE_LOGIN_CAP_H)
+#include <login_cap.h>
+#endif
+
+#if defined(USE_BSD_AUTH)
+#include <bsd_auth.h>
+#endif
+
+#if defined(USE_PAM)
+#include <security/pam_appl.h>
+#include <security/openpam.h>
+
+static struct pam_conv pamc = { openpam_ttyconv, NULL };
+#endif
+
 #include "doas.h"
 
-static void __dead
+static void 
 usage(void)
 {
 	fprintf(stderr, "usage: doas [-ns] [-a style] [-C config] [-u user]"
@@ -182,7 +203,7 @@ parseconfig(const char *filename, int checkperms)
 		exit(1);
 }
 
-static void __dead
+static void 
 checkconfig(const char *confpath, int argc, char **argv,
     uid_t uid, gid_t *groups, int ngroups, uid_t target)
 {
@@ -230,8 +251,10 @@ main(int argc, char **argv)
 
 	setprogname("doas");
 
+        /*
 	if (pledge("stdio rpath getpw tty proc exec id", NULL) == -1)
 		err(1, "pledge");
+        */
 
 	closefrom(STDERR_FILENO + 1);
 
@@ -295,7 +318,13 @@ main(int argc, char **argv)
 		exit(1);	/* fail safe */
 	}
 
-	parseconfig("/etc/doas.conf", 1);
+#if defined(USE_PAM)
+	pam_handle_t *pamh = NULL;
+	int pam_err;
+	int pam_silent = PAM_SILENT;
+#endif
+
+	parseconfig("/usr/local/etc/doas.conf", 1);
 
 	/* cmdline is used only for logging, no need to abort on truncate */
 	(void) strlcpy(cmdline, argv[0], sizeof(cmdline));
@@ -315,6 +344,7 @@ main(int argc, char **argv)
 	}
 
 	if (!(rule->options & NOPASS)) {
+#if defined(USE_BSD_AUTH)      
 		char *challenge = NULL, *response, rbuf[1024], cbuf[128];
 		auth_session_t *as;
 
@@ -325,7 +355,7 @@ main(int argc, char **argv)
 		    &challenge)))
 			errx(1, "Authorization failed");
 		if (!challenge) {
-			char host[HOST_NAME_MAX + 1];
+			char host[MAXHOSTNAME + 1];
 			if (gethostname(host, sizeof(host)))
 				snprintf(host, sizeof(host), "?");
 			snprintf(cbuf, sizeof(cbuf),
@@ -345,30 +375,95 @@ main(int argc, char **argv)
 			errc(1, EPERM, NULL);
 		}
 		explicit_bzero(rbuf, sizeof(rbuf));
+#elif defined(USE_PAM)
+#define PAM_END(msg) do { 						\
+	syslog(LOG_ERR, "%s: %s", msg, pam_strerror(pamh, pam_err)); 	\
+	warnx("%s: %s", msg, pam_strerror(pamh, pam_err));		\
+	pam_end(pamh, pam_err);						\
+	exit(EXIT_FAILURE);						\
+} while (/*CONSTCOND*/0)
+
+		pam_err = pam_start("doas", myname, &pamc, &pamh);
+		if (pam_err != PAM_SUCCESS) {
+			if (pamh != NULL)
+				PAM_END("pam_start");
+			syslog(LOG_ERR, "pam_start failed: %s",
+			    pam_strerror(pamh, pam_err));
+			errx(EXIT_FAILURE, "pam_start failed");
+		}
+
+		switch (pam_err = pam_authenticate(pamh, pam_silent)) {
+		case PAM_SUCCESS:
+			switch (pam_err = pam_acct_mgmt(pamh, pam_silent)) {
+			case PAM_SUCCESS:
+				break;
+
+			case PAM_NEW_AUTHTOK_REQD:
+				pam_err = pam_chauthtok(pamh,
+				    pam_silent|PAM_CHANGE_EXPIRED_AUTHTOK);
+				if (pam_err != PAM_SUCCESS)
+					PAM_END("pam_chauthtok");
+				break;
+
+			case PAM_AUTH_ERR:
+			case PAM_USER_UNKNOWN:
+			case PAM_MAXTRIES:
+				syslog(LOG_AUTHPRIV | LOG_NOTICE,
+				    "failed auth for %s", myname);
+				break;
+
+			default:
+				PAM_END("pam_acct_mgmt");
+				break;
+			}
+			break;
+
+		case PAM_AUTH_ERR:
+		case PAM_USER_UNKNOWN:
+		case PAM_MAXTRIES:
+			syslog(LOG_AUTHPRIV | LOG_NOTICE,
+			    "failed auth for %s", myname);
+			break;
+
+		default:
+			PAM_END("pam_authenticate");
+			break;
+		}
+		pam_end(pamh, pam_err);
+#else
+#error	No auth module!
+#endif
+
 	}
 
+        /*
 	if (pledge("stdio rpath getpw exec id", NULL) == -1)
 		err(1, "pledge");
-
+        */
 	pw = getpwuid(target);
 	if (!pw)
 		errx(1, "no passwd entry for target");
 
+#if defined(HAVE_LOGIN_CAP_H)
 	if (setusercontext(NULL, pw, target, LOGIN_SETGROUP |
 	    LOGIN_SETPRIORITY | LOGIN_SETRESOURCES | LOGIN_SETUMASK |
 	    LOGIN_SETUSER) != 0)
 		errx(1, "failed to set user context for target");
-
+#endif
+        /*
 	if (pledge("stdio rpath exec", NULL) == -1)
 		err(1, "pledge");
+        */
 
 	if (getcwd(cwdpath, sizeof(cwdpath)) == NULL)
 		cwd = "(failed)";
 	else
 		cwd = cwdpath;
 
-	if (pledge("stdio exec", NULL) == -1)
+	/*
+        if (pledge("stdio exec", NULL) == -1)
 		err(1, "pledge");
+        */
 
 	syslog(LOG_AUTHPRIV | LOG_INFO, "%s ran command %s as %s from %s",
 	    myname, cmdline, pw->pw_name, cwd);
