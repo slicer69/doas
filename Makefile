@@ -15,6 +15,8 @@ execvpe.o: doas.h execvpe.c
 
 doas.o: doas.h doas.c parse.y
 
+reallocarray.o: doas.h reallocarray.c
+
 y.tab.o: parse.y
 	$(YACC) parse.y
 	$(CC) $(CFLAGS) -c y.tab.c
