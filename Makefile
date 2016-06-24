@@ -3,7 +3,7 @@ YACC?=yacc
 BIN=doas
 PREFIX?=/usr/local
 OBJECTS=doas.o env.o execvpe.o reallocarray.o y.tab.o
-CFLAGS+=-DUSE_PAM
+CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${PREFIX}/etc/doas.conf\"
 LDFLAGS+=-lpam
 
 all: $(OBJECTS)
