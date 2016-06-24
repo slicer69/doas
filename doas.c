@@ -410,6 +410,7 @@ main(int argc, char **argv)
 			case PAM_MAXTRIES:
 				syslog(LOG_AUTHPRIV | LOG_NOTICE,
 				    "failed auth for %s", myname);
+                                errx(EXIT_FAILURE, "second authentication failed");
 				break;
 
 			default:
@@ -423,6 +424,7 @@ main(int argc, char **argv)
 		case PAM_MAXTRIES:
 			syslog(LOG_AUTHPRIV | LOG_NOTICE,
 			    "failed auth for %s", myname);
+                        errx(EXIT_FAILURE, "authentication failed");
 			break;
 
 		default:
