@@ -1,26 +1,23 @@
 CC?=clang
-YC?=yacc
+YACC?=yacc
 BIN=doas
 PREFIX?=/usr/local
 OBJECTS=doas.o env.o execvpe.o reallocarray.o y.tab.o
-CFLAG+= -DUSE_PAM
-LFLAG+= -lpam
+CFLAGS+=-DUSE_PAM
+LDFLAGS+=-lpam
 
 all: $(OBJECTS)
-	$(CC) -o $(BIN) $(LFLAG) $(OBJECTS)
+	$(CC) -o $(BIN) $(LDFLAGS) $(OBJECTS)
 
-env.o: doas.h env.c 
-	$(CC) -c env.c 
+env.o: doas.h env.c
 
 execvpe.o: doas.h execvpe.c
-	$(CC) -c execvpe.c
 
 doas.o: doas.h doas.c parse.y
-	$(CC) $(CFLAG) -c doas.c
 
 y.tab.o: parse.y
-	$(YC) parse.y
-	$(CC) -c y.tab.c
+	$(YACC) parse.y
+	$(CC) $(CFLAGS) -c y.tab.c
 
 install: all
 	cp $(BIN) $(PREFIX)/bin/
