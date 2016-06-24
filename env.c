@@ -95,7 +95,7 @@ flattenenv(struct env *env)
 	struct envnode *node;
 	u_int i;
 
-        envp = realloc(NULL, (env->count + 1) * sizeof(char *));
+        envp = reallocarray(NULL, (env->count + 1), sizeof(char *));
 	if (!envp)
 		err(1, NULL);
 	i = 0;

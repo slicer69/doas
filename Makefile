@@ -2,7 +2,7 @@ CC?=clang
 YC?=yacc
 BIN=doas
 PREFIX?=/usr/local
-OBJECTS=doas.o env.o execvpe.o y.tab.o
+OBJECTS=doas.o env.o execvpe.o reallocarray.o y.tab.o
 CFLAG+= -DUSE_PAM
 LFLAG+= -lpam
 

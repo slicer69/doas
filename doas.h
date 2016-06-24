@@ -27,11 +27,7 @@ char **prepenv(struct rule *);
 #define _PW_NAME_LEN 32
 #endif
 
-#if !defined(HAVE_REALLOCARRAY) && !defined(HAVE_REALLOCARR)
-int reallocarr(void *ptr, size_t num, size_t size);
-#endif	/* !HAVE_REALLOCARRAY && !HAVE_REALLOCARR */
-
-
+void *reallocarray(void *ptr, size_t nmemb, size_t size);
 
 #if !defined(HAVE_EXECVPE)
 int execvpe(const char *file, char * const *argv, char * const *envp);
