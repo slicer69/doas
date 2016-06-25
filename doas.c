@@ -51,6 +51,7 @@
 #include <security/openpam.h>
 
 static struct pam_conv pamc = { openpam_ttyconv, NULL };
+#include <fcntl.h>
 #endif
 
 #include "doas.h"
@@ -248,6 +249,9 @@ main(int argc, char **argv)
 	const char *cwd;
 	char *login_style = NULL;
 	char **envp;
+        #ifdef USE_PAM
+        int temp_stdout;
+        #endif
 
 	setprogname("doas");
 
@@ -383,6 +387,10 @@ main(int argc, char **argv)
 	exit(EXIT_FAILURE);						\
 } while (/*CONSTCOND*/0)
 
+                /* force password prompt to display on stderr, not stdout */
+                temp_stdout = dup(1);
+                close(1);
+                dup2(2, 1);
 		pam_err = pam_start("doas", myname, &pamc, &pamh);
 		if (pam_err != PAM_SUCCESS) {
 			if (pamh != NULL)
@@ -466,6 +474,11 @@ main(int argc, char **argv)
         if (pledge("stdio exec", NULL) == -1)
 		err(1, "pledge");
         */
+        /* Re-establish stdout */
+        #ifdef USE_PAM
+        close(1);
+        dup2(temp_stdout, 1);
+        #endif
 
 	syslog(LOG_AUTHPRIV | LOG_INFO, "%s ran command %s as %s from %s",
 	    myname, cmdline, pw->pw_name, cwd);
