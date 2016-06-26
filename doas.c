@@ -526,6 +526,11 @@ main(int argc, char **argv)
         dup2(temp_stdout, 1);
         #endif
 
+        /* If we effectively root, set the UID to actually be root to avoid
+           permission errors. */
+        if ( geteuid() == ROOT_UID )
+           setuid(ROOT_UID);
+
 	syslog(LOG_AUTHPRIV | LOG_INFO, "%s ran command %s as %s from %s",
 	    myname, cmdline, pw->pw_name, cwd);
 

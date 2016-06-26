@@ -31,6 +31,10 @@ char **prepenv(struct rule *);
 #define GID_MAX 65535
 #endif
 
+#ifndef ROOT_UID
+#define ROOT_UID 0
+#endif
+
 #ifndef _PW_NAME_LEN
 #define _PW_NAME_LEN 32
 #endif
