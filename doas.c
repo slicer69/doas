@@ -55,7 +55,6 @@
 #include <security/openpam.h>
 static struct pam_conv pamc = { openpam_ttyconv, NULL };
 #include <fcntl.h>
-#endif
 #endif // BSD using PAM
 
 #ifdef linux
