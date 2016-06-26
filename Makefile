@@ -5,6 +5,10 @@ PREFIX?=/usr/local
 OBJECTS=doas.o env.o execvpe.o reallocarray.o y.tab.o
 CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${PREFIX}/etc/doas.conf\"
 LDFLAGS+=-lpam
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+    LDFLAGS+=-lpam_misc
+endif
 
 all: $(OBJECTS)
 	$(CC) -o $(BIN) $(LDFLAGS) $(OBJECTS)
@@ -24,7 +28,9 @@ y.tab.o: parse.y
 install: all
 	cp $(BIN) $(PREFIX)/bin/
 	chmod 4755 $(PREFIX)/bin/$(BIN)
+	mkdir -p $(PREFIX)/man/man1
 	cp doas.1 $(PREFIX)/man/man1/
+	mkdir -p $(PREFIX)/man/man5
 	cp doas.conf.5 $(PREFIX)/man/man5/
 
 clean:

@@ -23,6 +23,18 @@ char **prepenv(struct rule *);
 #define NOPASS		0x1
 #define KEEPENV		0x2
 
+#ifndef UID_MAX
+#define UID_MAX 65535
+#endif
+
+#ifndef GID_MAX
+#define GID_MAX 65535
+#endif
+
+#ifndef ROOT_UID
+#define ROOT_UID 0
+#endif
+
 #ifndef _PW_NAME_LEN
 #define _PW_NAME_LEN 32
 #endif
@@ -33,3 +45,6 @@ void *reallocarray(void *ptr, size_t nmemb, size_t size);
 int execvpe(const char *file, char * const *argv, char * const *envp);
 #endif	/* !HAVE_EXECVPE */
 
+#ifdef linux
+void errc(int eval, int code, const char *format);
+#endif
