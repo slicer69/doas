@@ -54,10 +54,8 @@
 #ifndef linux
 #include <security/openpam.h>
 static struct pam_conv pamc = { openpam_ttyconv, NULL };
-<<<<<<< HEAD
 #include <fcntl.h>
 #endif
-=======
 #endif // BSD using PAM
 
 #ifdef linux
@@ -66,7 +64,6 @@ static struct pam_conv pamc = { misc_conv, NULL };
 #endif // Linux using PAM
 
 #endif // PAM
->>>>>>> linux
 
 #include "doas.h"
 
@@ -530,14 +527,11 @@ main(int argc, char **argv)
         close(1);
         dup2(temp_stdout, 1);
         #endif
-<<<<<<< HEAD
-=======
 
         /* If we effectively root, set the UID to actually be root to avoid
            permission errors. */
         if ( geteuid() == ROOT_UID )
            setuid(ROOT_UID);
->>>>>>> linux
 
 	syslog(LOG_AUTHPRIV | LOG_INFO, "%s ran command %s as %s from %s",
 	    myname, cmdline, pw->pw_name, cwd);
