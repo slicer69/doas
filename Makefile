@@ -5,6 +5,10 @@ PREFIX?=/usr/local
 OBJECTS=doas.o env.o execvpe.o reallocarray.o y.tab.o
 CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${PREFIX}/etc/doas.conf\"
 LDFLAGS+=-lpam
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+    LDFLAGS+=-lpam_misc
+endif
 
 all: $(OBJECTS)
 	$(CC) -o $(BIN) $(LDFLAGS) $(OBJECTS)

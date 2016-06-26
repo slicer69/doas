@@ -50,12 +50,18 @@
 
 #if defined(USE_PAM)
 #include <security/pam_appl.h>
+
 #ifndef linux
 #include <security/openpam.h>
-#endif
-
 static struct pam_conv pamc = { openpam_ttyconv, NULL };
-#endif
+#endif // BSD using PAM
+
+#ifdef linux
+#include <security/pam_misc.h>
+static struct pam_conv pamc = { misc_conv, NULL };
+#endif // Linux using PAM
+
+#endif // PAM
 
 #include "doas.h"
 
