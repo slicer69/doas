@@ -54,7 +54,7 @@
 #include <security/openpam.h>
 #endif
 
-static struct pam_conv pamc = { NULL };
+static struct pam_conv pamc = { openpam_ttyconv, NULL };
 #endif
 
 #include "doas.h"
