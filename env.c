@@ -16,7 +16,9 @@
  */
 
 #include <sys/types.h>
+#ifndef linux
 #include <sys/tree.h>
+#endif
 
 #include <string.h>
 #include <stdio.h>
@@ -24,6 +26,10 @@
 #include <err.h>
 #include <unistd.h>
 #include <errno.h>
+
+#ifdef linux
+#include "tree.h"
+#endif
 
 #include "doas.h"
 

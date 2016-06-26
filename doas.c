@@ -27,7 +27,9 @@
 #include <login_cap.h>
 #include <bsd_auth.h>
 */
+#ifndef linux
 #include <readpassphrase.h>
+#endif
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,9 +50,11 @@
 
 #if defined(USE_PAM)
 #include <security/pam_appl.h>
+#ifndef linux
 #include <security/openpam.h>
+#endif
 
-static struct pam_conv pamc = { openpam_ttyconv, NULL };
+static struct pam_conv pamc = { NULL };
 #endif
 
 #include "doas.h"
@@ -62,6 +66,15 @@ usage(void)
 	    " command [args]\n");
 	exit(1);
 }
+
+#ifdef linux
+void
+errc(int eval, int code, const char *format)
+{
+   fprintf(stderr, format);
+   exit(code);
+}
+#endif
 
 size_t
 arraylen(const char **arr)
@@ -85,7 +98,12 @@ parseuid(const char *s, uid_t *uid)
 		*uid = pw->pw_uid;
 		return 0;
 	}
+        #ifndef linux
 	*uid = strtonum(s, 0, UID_MAX, &errstr);
+        #endif
+        #ifdef linux
+        sscanf(s, "%d", uid);
+        #endif
 	if (errstr)
 		return -1;
 	return 0;
@@ -113,7 +131,12 @@ parsegid(const char *s, gid_t *gid)
 		*gid = gr->gr_gid;
 		return 0;
 	}
+        #ifndef linux
 	*gid = strtonum(s, 0, GID_MAX, &errstr);
+        #endif
+        #ifdef linux
+        sscanf(s, "%d", gid);
+        #endif
 	if (errstr)
 		return -1;
 	return 0;
@@ -249,14 +272,18 @@ main(int argc, char **argv)
 	char *login_style = NULL;
 	char **envp;
 
+        #ifndef linux
 	setprogname("doas");
+        #endif
 
         /*
 	if (pledge("stdio rpath getpw tty proc exec id", NULL) == -1)
 		err(1, "pledge");
         */
 
+        #ifndef linux
 	closefrom(STDERR_FILENO + 1);
+        #endif
 
 	uid = getuid();
 
@@ -295,8 +322,13 @@ main(int argc, char **argv)
 	pw = getpwuid(uid);
 	if (!pw)
 		err(1, "getpwuid failed");
+        #ifndef linux
 	if (strlcpy(myname, pw->pw_name, sizeof(myname)) >= sizeof(myname))
 		errx(1, "pw_name too long");
+        #endif
+        #ifdef linux
+        strncpy(myname, pw->pw_name, sizeof(myname));
+        #endif
 	ngroups = getgroups(NGROUPS_MAX, groups);
 	if (ngroups == -1)
 		err(1, "can't get groups");
@@ -327,6 +359,7 @@ main(int argc, char **argv)
 	parseconfig(DOAS_CONF, 1);
 
 	/* cmdline is used only for logging, no need to abort on truncate */
+        #ifndef linux
 	(void) strlcpy(cmdline, argv[0], sizeof(cmdline));
 	for (i = 1; i < argc; i++) {
 		if (strlcat(cmdline, " ", sizeof(cmdline)) >= sizeof(cmdline))
@@ -334,6 +367,14 @@ main(int argc, char **argv)
 		if (strlcat(cmdline, argv[i], sizeof(cmdline)) >= sizeof(cmdline))
 			break;
 	}
+        #endif
+        #ifdef linux
+        strncpy(cmdline, argv[0], sizeof(cmdline));
+        for (i = 1; i < argc; i++) {
+                strncat(cmdline, " ", sizeof(cmdline));
+                strncat(cmdline, argv[i], sizeof(cmdline));
+        }
+        #endif
 
 	cmd = argv[0];
 	if (!permit(uid, groups, ngroups, &rule, target, cmd,
