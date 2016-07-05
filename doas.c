@@ -523,8 +523,11 @@ main(int argc, char **argv)
         */
         /* Re-establish stdout */
         #ifdef USE_PAM
-        close(1);
-        dup2(temp_stdout, 1);
+        if (!(rule->options & NOPASS))
+        {
+          close(1);
+          dup2(temp_stdout, 1);
+        }
         #endif
 
         /* If we effectively root, set the UID to actually be root to avoid
