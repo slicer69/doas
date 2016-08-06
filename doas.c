@@ -530,8 +530,10 @@ main(int argc, char **argv)
         }
         #endif
 
-        /* If we effectively root, set the UID to actually be root to avoid
+        /* If we effectively are root, set the UID to actually be root to avoid
            permission errors. */
+        if (target != 0)
+           setuid(target);
         if ( geteuid() == ROOT_UID )
            setuid(ROOT_UID);
 
