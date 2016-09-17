@@ -530,12 +530,14 @@ main(int argc, char **argv)
         }
         #endif
 
+#ifndef HAVE_LOGIN_CAP_H
         /* If we effectively are root, set the UID to actually be root to avoid
            permission errors. */
         if (target != 0)
            setuid(target);
         if ( geteuid() == ROOT_UID )
            setuid(ROOT_UID);
+#endif
 
 	syslog(LOG_AUTHPRIV | LOG_INFO, "%s ran command %s as %s from %s",
 	    myname, cmdline, pw->pw_name, cwd);
