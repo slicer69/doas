@@ -9,6 +9,10 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
     LDFLAGS+=-lpam_misc
 endif
+ifeq ($(UNAME_S),FreeBSD)
+    CFLAGS+=-DHAVE_LOGIN_CAP_H
+    LDFLAGS+=-lutil
+endif
 
 all: $(OBJECTS)
 	$(CC) -o $(BIN) $(LDFLAGS) $(OBJECTS)
