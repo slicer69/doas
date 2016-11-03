@@ -426,6 +426,8 @@ main(int argc, char **argv)
 } while (/*CONSTCOND*/0)
 		pam_handle_t *pamh = NULL;
 		int pam_err;
+
+#ifndef linux
 		int temp_stdin;
 
 		/* openpam_ttyconv checks if stdin is a terminal and
@@ -442,6 +444,15 @@ main(int argc, char **argv)
 		if (temp_stdin == -1)
 			err(1, "dup");
 		close(STDIN_FILENO);
+#else
+		/* force password prompt to display on stderr, not stdout */
+		int temp_stdout = dup(1);
+		if (temp_stdout == -1)
+			err(1, "dup");
+		close(1);
+		if (dup2(2, 1) == -1)
+			err(1, "dup2");
+#endif
 
 		pam_err = pam_start("doas", myname, &pamc, &pamh);
 		if (pam_err != PAM_SUCCESS) {
@@ -493,10 +504,17 @@ main(int argc, char **argv)
 		}
 		pam_end(pamh, pam_err);
 
+#ifndef linux
 		/* Re-establish stdin */
 		if (dup2(temp_stdin, STDIN_FILENO) == -1)
 			err(1, "dup2");
 		close(temp_stdin);
+#else
+		/* Re-establish stdout */
+		close(1);
+		if (dup2(temp_stdout, 1) == -1)
+			err(1, "dup2");
+#endif
 #else
 #error	No auth module!
 #endif

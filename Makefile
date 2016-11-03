@@ -15,7 +15,7 @@ ifeq ($(UNAME_S),FreeBSD)
 endif
 
 all: $(OBJECTS)
-	$(CC) -o $(BIN) $(LDFLAGS) $(OBJECTS)
+	$(CC) -o $(BIN) $(OBJECTS) $(LDFLAGS)
 
 env.o: doas.h env.c
 
