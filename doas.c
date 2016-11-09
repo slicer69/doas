@@ -278,9 +278,6 @@ main(int argc, char **argv)
 	const char *cwd;
 	char *login_style = NULL;
 	char **envp;
-        #ifdef USE_PAM
-        int temp_stdout;
-        #endif
 
         #ifndef linux
 	setprogname("doas");
@@ -360,12 +357,6 @@ main(int argc, char **argv)
 		exit(1);	/* fail safe */
 	}
 
-#if defined(USE_PAM)
-	pam_handle_t *pamh = NULL;
-	int pam_err;
-	int pam_silent = PAM_SILENT;
-#endif
-
 	parseconfig(DOAS_CONF, 1);
 
 	/* cmdline is used only for logging, no need to abort on truncate */
@@ -433,11 +424,36 @@ main(int argc, char **argv)
 	pam_end(pamh, pam_err);						\
 	exit(EXIT_FAILURE);						\
 } while (/*CONSTCOND*/0)
+		pam_handle_t *pamh = NULL;
+		int pam_err;
 
-                /* force password prompt to display on stderr, not stdout */
-                temp_stdout = dup(1);
-                close(1);
-                dup2(2, 1);
+#ifndef linux
+		int temp_stdin;
+
+		/* openpam_ttyconv checks if stdin is a terminal and
+		 * if it is then does not bother to open /dev/tty.
+		 * The result is that PAM writes the password prompt
+		 * directly to stdout.  In scenarios where stdin is a
+		 * terminal, but stdout is redirected to a file
+		 * e.g. by running doas ls &> ls.out interactively,
+		 * the password prompt gets written to ls.out as well.
+		 * By closing stdin first we forces PAM to read/write
+		 * to/from the terminal directly.  We restore stdin
+		 * after authenticating. */
+		temp_stdin = dup(STDIN_FILENO);
+		if (temp_stdin == -1)
+			err(1, "dup");
+		close(STDIN_FILENO);
+#else
+		/* force password prompt to display on stderr, not stdout */
+		int temp_stdout = dup(1);
+		if (temp_stdout == -1)
+			err(1, "dup");
+		close(1);
+		if (dup2(2, 1) == -1)
+			err(1, "dup2");
+#endif
+
 		pam_err = pam_start("doas", myname, &pamc, &pamh);
 		if (pam_err != PAM_SUCCESS) {
 			if (pamh != NULL)
@@ -447,15 +463,15 @@ main(int argc, char **argv)
 			errx(EXIT_FAILURE, "pam_start failed");
 		}
 
-		switch (pam_err = pam_authenticate(pamh, pam_silent)) {
+		switch (pam_err = pam_authenticate(pamh, PAM_SILENT)) {
 		case PAM_SUCCESS:
-			switch (pam_err = pam_acct_mgmt(pamh, pam_silent)) {
+			switch (pam_err = pam_acct_mgmt(pamh, PAM_SILENT)) {
 			case PAM_SUCCESS:
 				break;
 
 			case PAM_NEW_AUTHTOK_REQD:
 				pam_err = pam_chauthtok(pamh,
-				    pam_silent|PAM_CHANGE_EXPIRED_AUTHTOK);
+				    PAM_SILENT|PAM_CHANGE_EXPIRED_AUTHTOK);
 				if (pam_err != PAM_SUCCESS)
 					PAM_END("pam_chauthtok");
 				break;
@@ -487,6 +503,18 @@ main(int argc, char **argv)
 			break;
 		}
 		pam_end(pamh, pam_err);
+
+#ifndef linux
+		/* Re-establish stdin */
+		if (dup2(temp_stdin, STDIN_FILENO) == -1)
+			err(1, "dup2");
+		close(temp_stdin);
+#else
+		/* Re-establish stdout */
+		close(1);
+		if (dup2(temp_stdout, 1) == -1)
+			err(1, "dup2");
+#endif
 #else
 #error	No auth module!
 #endif
@@ -521,15 +549,6 @@ main(int argc, char **argv)
         if (pledge("stdio exec", NULL) == -1)
 		err(1, "pledge");
         */
-        /* Re-establish stdout */
-        #ifdef USE_PAM
-        if (!(rule->options & NOPASS))
-        {
-          close(1);
-          dup2(temp_stdout, 1);
-        }
-        #endif
-
 #ifndef HAVE_LOGIN_CAP_H
         /* If we effectively are root, set the UID to actually be root to avoid
            permission errors. */
