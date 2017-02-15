@@ -49,6 +49,9 @@ envcmp(struct envnode *a, struct envnode *b)
 {
 	return strcmp(a->key, b->key);
 }
+#ifdef __DragonFly__
+RB_PROTOTYPE_STATIC(envtree, envnode, node, envcmp);
+#endif
 RB_GENERATE_STATIC(envtree, envnode, node, envcmp)
 
 struct env *createenv(char **);
