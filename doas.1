@@ -25,6 +25,7 @@
 .Op Fl a Ar style
 .Op Fl C Ar config
 .Op Fl u Ar user
+.Op Fl -
 .Ar command
 .Op Ar args
 .Sh DESCRIPTION
@@ -80,6 +81,8 @@ or
 Execute the command as
 .Ar user .
 The default is root.
+.It Fl -
+Any dashes after a combined double dash (--) will be interpreted as part of the command to be run or its paramters. Not an argument passed to doas itself.
 .El
 .Sh EXIT STATUS
 .Ex -std doas
