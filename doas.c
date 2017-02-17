@@ -17,6 +17,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/ioctl.h>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
@@ -39,6 +40,7 @@
 #include <grp.h>
 #include <syslog.h>
 #include <errno.h>
+#include <fcntl.h>
 
 #if defined(HAVE_LOGIN_CAP_H)
 #include <login_cap.h>
@@ -82,18 +84,6 @@ errc(int eval, int code, const char *format)
    exit(code);
 }
 #endif
-
-size_t
-arraylen(const char **arr)
-{
-	size_t cnt = 0;
-
-	while (*arr) {
-		cnt++;
-		arr++;
-	}
-	return cnt;
-}
 
 static int
 parseuid(const char *s, uid_t *uid)
@@ -254,6 +244,54 @@ checkconfig(const char *confpath, int argc, char **argv,
 	}
 }
 
+#if defined(USE_BSD_AUTH)      
+static void
+authuser(char *myname, char *login_style, int persist)
+{
+	char *challenge = NULL, *response, rbuf[1024], cbuf[128];
+	auth_session_t *as;
+	int fd = -1;
+
+	if (persist)
+		fd = open("/dev/tty", O_RDWR);
+	if (fd != -1) {
+		if (ioctl(fd, TIOCCHKVERAUTH) == 0)
+			goto good;
+	}
+
+	if (!(as = auth_userchallenge(myname, login_style, "auth-doas",
+	    &challenge)))
+		errx(1, "Authorization failed");
+	if (!challenge) {
+		char host[HOST_NAME_MAX + 1];
+		if (gethostname(host, sizeof(host)))
+			snprintf(host, sizeof(host), "?");
+		snprintf(cbuf, sizeof(cbuf),
+		    "\rdoas (%.32s@%.32s) password: ", myname, host);
+		challenge = cbuf;
+	}
+	response = readpassphrase(challenge, rbuf, sizeof(rbuf),
+	    RPP_REQUIRE_TTY);
+	if (response == NULL && errno == ENOTTY) {
+		syslog(LOG_AUTHPRIV | LOG_NOTICE,
+		    "tty required for %s", myname);
+		errx(1, "a tty is required");
+	}
+	if (!auth_userresponse(as, response, 0)) {
+		syslog(LOG_AUTHPRIV | LOG_NOTICE,
+		    "failed auth for %s", myname);
+		errc(1, EPERM, NULL);
+	}
+	explicit_bzero(rbuf, sizeof(rbuf));
+good:
+	if (fd != -1) {
+		int secs = 5 * 60;
+		ioctl(fd, TIOCSETVERAUTH, &secs);
+		close(fd);
+	}
+}
+#endif
+
 int
 main(int argc, char **argv)
 {
@@ -283,11 +321,6 @@ main(int argc, char **argv)
 	setprogname("doas");
         #endif
 
-        /*
-	if (pledge("stdio rpath getpw tty proc exec id", NULL) == -1)
-		err(1, "pledge");
-        */
-
         #ifndef linux
 	closefrom(STDERR_FILENO + 1);
         #endif
@@ -295,6 +328,7 @@ main(int argc, char **argv)
 	uid = getuid();
 
 	while ((ch = getopt(argc, argv, "a:C:nsu:")) != -1) {
+/*	while ((ch = getopt(argc, argv, "a:C:Lnsu:")) != -1) { */
 		switch (ch) {
 		case 'a':
 			login_style = optarg;
@@ -302,6 +336,12 @@ main(int argc, char **argv)
 		case 'C':
 			confpath = optarg;
 			break;
+/*		case 'L':
+			i = open("/dev/tty", O_RDWR);
+			if (i != -1)
+				ioctl(i, TIOCCLRVERAUTH);
+			exit(i != -1);
+*/
 		case 'u':
 			if (parseuid(optarg, &target) != 0)
 				errx(1, "unknown user");
@@ -343,9 +383,11 @@ main(int argc, char **argv)
 
 	if (sflag) {
 		sh = getenv("SHELL");
-		if (sh == NULL || *sh == '\0')
-			shargv[0] = pw->pw_shell;
-		else
+		if (sh == NULL || *sh == '\0') {
+			shargv[0] = strdup(pw->pw_shell);
+			if (shargv[0] == NULL)
+				err(1, NULL);
+		} else
 			shargv[0] = sh;
 		argv = shargv;
 		argc = 1;
@@ -357,11 +399,14 @@ main(int argc, char **argv)
 		exit(1);	/* fail safe */
 	}
 
+	if (geteuid())
+		errx(1, "not installed setuid");
+
 	parseconfig(DOAS_CONF, 1);
 
 	/* cmdline is used only for logging, no need to abort on truncate */
         #ifndef linux
-	(void) strlcpy(cmdline, argv[0], sizeof(cmdline));
+	(void)strlcpy(cmdline, argv[0], sizeof(cmdline));
 	for (i = 1; i < argc; i++) {
 		if (strlcat(cmdline, " ", sizeof(cmdline)) >= sizeof(cmdline))
 			break;
@@ -379,7 +424,7 @@ main(int argc, char **argv)
 
 	cmd = argv[0];
 	if (!permit(uid, groups, ngroups, &rule, target, cmd,
-	    (const char**)argv + 1)) {
+	    (const char **)argv + 1)) {
 		syslog(LOG_AUTHPRIV | LOG_NOTICE,
 		    "failed command for %s: %s", myname, cmdline);
 		errc(1, EPERM, NULL);
@@ -387,36 +432,10 @@ main(int argc, char **argv)
 
 	if (!(rule->options & NOPASS)) {
 #if defined(USE_BSD_AUTH)      
-		char *challenge = NULL, *response, rbuf[1024], cbuf[128];
-		auth_session_t *as;
-
 		if (nflag)
 			errx(1, "Authorization required");
 
-		if (!(as = auth_userchallenge(myname, login_style, "auth-doas",
-		    &challenge)))
-			errx(1, "Authorization failed");
-		if (!challenge) {
-			char host[MAXHOSTNAME + 1];
-			if (gethostname(host, sizeof(host)))
-				snprintf(host, sizeof(host), "?");
-			snprintf(cbuf, sizeof(cbuf),
-			    "\rdoas (%.32s@%.32s) password: ", myname, host);
-			challenge = cbuf;
-		}
-		response = readpassphrase(challenge, rbuf, sizeof(rbuf),
-		    RPP_REQUIRE_TTY);
-		if (response == NULL && errno == ENOTTY) {
-			syslog(LOG_AUTHPRIV | LOG_NOTICE,
-			    "tty required for %s", myname);
-			errx(1, "a tty is required");
-		}
-		if (!auth_userresponse(as, response, 0)) {
-			syslog(LOG_AUTHPRIV | LOG_NOTICE,
-			    "failed auth for %s", myname);
-			errc(1, EPERM, NULL);
-		}
-		explicit_bzero(rbuf, sizeof(rbuf));
+		authuser(myname, login_style, rule->options & PERSIST);
 #elif defined(USE_PAM)
 #define PAM_END(msg) do { 						\
 	syslog(LOG_ERR, "%s: %s", msg, pam_strerror(pamh, pam_err)); 	\
@@ -518,7 +537,6 @@ main(int argc, char **argv)
 #else
 #error	No auth module!
 #endif
-
 	}
 
         /*
