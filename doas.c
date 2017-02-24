@@ -415,10 +415,10 @@ main(int argc, char **argv)
 	}
         #endif
         #ifdef linux
-        strncpy(cmdline, argv[0], sizeof(cmdline));
+        strncpy(cmdline, argv[0], sizeof(cmdline) - 1);
         for (i = 1; i < argc; i++) {
-                strncat(cmdline, " ", sizeof(cmdline));
-                strncat(cmdline, argv[i], sizeof(cmdline));
+                strncat(cmdline, " ", sizeof(cmdline) - strlen(cmdline) - 1);
+                strncat(cmdline, argv[i], sizeof(cmdline) - strlen(cmdline) - 1);
         }
         #endif
 
