@@ -62,4 +62,6 @@ int execvpe(const char *file, char * const *argv, char * const *envp);
 
 #ifdef linux
 void errc(int eval, int code, const char *format);
+size_t strlcat(char *dst, const char *src, size_t dsize);
+size_t strlcpy(char *dst, const char *src, size_t dsize);
 #endif
