@@ -40,6 +40,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "doas.h"
+
 int
 execvpe(const char *name, char *const *argv, char *const *envp)
 {
