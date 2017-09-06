@@ -8,6 +8,7 @@ LDFLAGS+=-lpam
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
     LDFLAGS+=-lpam_misc
+    OBJECTS+=strlcat.o strlcpy.o
 endif
 ifeq ($(UNAME_S),FreeBSD)
     CFLAGS+=-DHAVE_LOGIN_CAP_H

@@ -369,13 +369,9 @@ main(int argc, char **argv)
 	pw = getpwuid(uid);
 	if (!pw)
 		err(1, "getpwuid failed");
-        #ifndef linux
 	if (strlcpy(myname, pw->pw_name, sizeof(myname)) >= sizeof(myname))
 		errx(1, "pw_name too long");
-        #endif
-        #ifdef linux
-        strncpy(myname, pw->pw_name, sizeof(myname));
-        #endif
+
 	ngroups = getgroups(NGROUPS_MAX, groups);
 	if (ngroups == -1)
 		err(1, "can't get groups");
@@ -405,7 +401,6 @@ main(int argc, char **argv)
 	parseconfig(DOAS_CONF, 1);
 
 	/* cmdline is used only for logging, no need to abort on truncate */
-        #ifndef linux
 	(void)strlcpy(cmdline, argv[0], sizeof(cmdline));
 	for (i = 1; i < argc; i++) {
 		if (strlcat(cmdline, " ", sizeof(cmdline)) >= sizeof(cmdline))
@@ -413,14 +408,6 @@ main(int argc, char **argv)
 		if (strlcat(cmdline, argv[i], sizeof(cmdline)) >= sizeof(cmdline))
 			break;
 	}
-        #endif
-        #ifdef linux
-        strncpy(cmdline, argv[0], sizeof(cmdline) - 1);
-        for (i = 1; i < argc; i++) {
-                strncat(cmdline, " ", sizeof(cmdline) - strlen(cmdline) - 1);
-                strncat(cmdline, argv[i], sizeof(cmdline) - strlen(cmdline) - 1);
-        }
-        #endif
 
 	cmd = argv[0];
 	if (!permit(uid, groups, ngroups, &rule, target, cmd,
@@ -590,3 +577,4 @@ main(int argc, char **argv)
 		errx(1, "%s: command not found", cmd);
 	err(1, "%s", cmd);
 }
+
