@@ -418,10 +418,10 @@ main(int argc, char **argv)
 	}
 
 	if (!(rule->options & NOPASS)) {
-#if defined(USE_BSD_AUTH)      
 		if (nflag)
 			errx(1, "Authorization required");
 
+#if defined(USE_BSD_AUTH) 
 		authuser(myname, login_style, rule->options & PERSIST);
 #elif defined(USE_PAM)
 #define PAM_END(msg) do { 						\
