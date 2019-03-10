@@ -3,12 +3,13 @@ YACC?=yacc
 BIN=doas
 PREFIX?=/usr/local
 OBJECTS=doas.o env.o execvpe.o reallocarray.o y.tab.o
-CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${PREFIX}/etc/doas.conf\"
+CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${PREFIX}/etc/doas.conf\" 
 LDFLAGS+=-lpam
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
     LDFLAGS+=-lpam_misc
     OBJECTS+=strlcat.o strlcpy.o
+    CFLAGS+=-D_GNU_SOURCE
 endif
 ifeq ($(UNAME_S),FreeBSD)
     CFLAGS+=-DHAVE_LOGIN_CAP_H
