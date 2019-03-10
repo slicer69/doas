@@ -90,7 +90,9 @@ createenv(struct rule *rule)
 	env->count = 0;
 
 	if (rule->options & KEEPENV) {
-		/* extern const char **environ; */
+                #ifndef linux
+		extern const char **environ;
+                #endif
 
 		for (i = 0; environ[i] != NULL; i++) {
 			struct envnode *node;
