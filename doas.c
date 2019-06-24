@@ -28,7 +28,7 @@
 #include <login_cap.h>
 #include <bsd_auth.h>
 */
-#ifndef linux
+#ifdef __freebsd__
 #include <readpassphrase.h>
 #endif
 #include <string.h>
@@ -95,10 +95,9 @@ parseuid(const char *s, uid_t *uid)
 		*uid = pw->pw_uid;
 		return 0;
 	}
-        #ifndef linux
+        #ifdef __freebsd__ 
 	*uid = strtonum(s, 0, UID_MAX, &errstr);
-        #endif
-        #ifdef linux
+        #else
         sscanf(s, "%d", uid);
         #endif
 	if (errstr)
@@ -128,10 +127,9 @@ parsegid(const char *s, gid_t *gid)
 		*gid = gr->gr_gid;
 		return 0;
 	}
-        #ifndef linux
+        #ifdef __freebsd__
 	*gid = strtonum(s, 0, GID_MAX, &errstr);
-        #endif
-        #ifdef linux
+        #else
         sscanf(s, "%d", gid);
         #endif
 	if (errstr)
@@ -228,8 +226,20 @@ checkconfig(const char *confpath, int argc, char **argv,
     uid_t uid, gid_t *groups, int ngroups, uid_t target)
 {
 	struct rule *rule;
+        int status;
 
-	setresuid(uid, uid, uid);
+        #ifdef linux
+	status = setresuid(uid, uid, uid);
+        #elif __freebsd__
+	status = setresuid(uid, uid, uid);
+        #else
+        status = setreuid(uid, uid);
+        #endif
+        if (status == -1)
+        {
+           printf("doas: Unable to set UID\n");
+           exit(1);
+        }
 	parseconfig(confpath, 0);
 	if (!argc)
 		exit(0);
@@ -510,7 +520,7 @@ main(int argc, char **argv)
 		}
 		pam_end(pamh, pam_err);
 
-#ifndef linux
+#ifndef linux 
 		/* Re-establish stdin */
 		if (dup2(temp_stdin, STDIN_FILENO) == -1)
 			err(1, "dup2");
@@ -520,7 +530,7 @@ main(int argc, char **argv)
 		close(1);
 		if (dup2(temp_stdout, 1) == -1)
 			err(1, "dup2");
-#endif 
+#endif
 #else
 #error	No auth module!
 #endif

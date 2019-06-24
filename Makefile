@@ -32,6 +32,7 @@ y.tab.o: parse.y
 	$(CC) $(CFLAGS) -c y.tab.c
 
 install: all
+	mkdir -p $(PREFIX)/bin
 	cp $(BIN) $(PREFIX)/bin/
 	chmod 4755 $(PREFIX)/bin/$(BIN)
 	mkdir -p $(PREFIX)/man/man1
