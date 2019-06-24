@@ -520,7 +520,7 @@ main(int argc, char **argv)
 		close(1);
 		if (dup2(temp_stdout, 1) == -1)
 			err(1, "dup2");
-#endif 
+#endif
 #else
 #error	No auth module!
 #endif
