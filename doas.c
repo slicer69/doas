@@ -80,7 +80,7 @@ usage(void)
 void
 errc(int eval, int code, const char *format)
 {
-   fprintf(stderr, format);
+   fprintf(stderr, "%s", format);
    exit(code);
 }
 #endif
