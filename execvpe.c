@@ -78,7 +78,6 @@ execvpe(const char *name, char *const *argv, char *const *envp)
 		return (-1);
 	}
 	strlcpy(cur, path, len);
-	path = cur;
 	while ((p = strsep(&cur, ":"))) {
 		/*
 		 * It's a SHELL path -- double, leading and trailing colons
