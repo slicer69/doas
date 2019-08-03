@@ -53,15 +53,20 @@ again for some time. Works on OpenBSD only, persist is not available on Linux or
 .It Ic keepenv
 The user's environment is maintained.
 The default is to reset the environment, except for the variables
-.Ev DISPLAY ,
-.Ev HOME ,
-.Ev LOGNAME ,
-.Ev MAIL ,
-.Ev PATH ,
-.Ev TERM ,
-.Ev USER
+.Ev DISPLAY 
 and
-.Ev USERNAME .
+.Ev TERM .
+
+Note: In order to be able to run most desktop (GUI) applications, the user needs to
+have the keepenv keyword specified. If keepenv is not specified then key elements, like
+the user's $HOME variable, will be reset and cause the GUI application to crash.
+Users who only need to run command line applications can usually get away without
+keepenv. When in doubt, try to avoid using keepenv as it is less secure to have
+environment variables passed to privileged users.
+
+Note: The target user's PATH variable can be set at compile time by adjusting the
+GLOBAL_PATH variable in doas's Makefile. By default, the target user's path will
+be set to "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:"
 .It Ic setenv { Oo Ar variable ... Oc Oo Ar variable=value ... Oc Ic }
 In addition to the variables mentioned above, keep the space-separated
 specified variables.

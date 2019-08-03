@@ -29,7 +29,12 @@ extern struct rule **rules;
 extern int nrules;
 extern int parse_errors;
 
-char **prepenv(struct rule *);
+struct passwd;
+char **prepenv(struct rule *, struct passwd *original, struct passwd *target);
+
+#ifndef GLOBAL_PATH 
+#define GLOBAL_PATH "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+#endif
 
 #define PERMIT	1
 #define DENY	2

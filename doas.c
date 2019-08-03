@@ -313,7 +313,7 @@ main(int argc, char **argv)
 	const char *cmd;
 	char cmdline[LINE_MAX];
 	char myname[_PW_NAME_LEN + 1];
-	struct passwd *pw;
+	struct passwd *original_pw, *target_pw;
 	struct rule *rule;
 	uid_t uid;
 	uid_t target = 0;
@@ -376,10 +376,10 @@ main(int argc, char **argv)
 	} else if ((!sflag && !argc) || (sflag && argc))
 		usage();
 
-	pw = getpwuid(uid);
-	if (!pw)
+	original_pw = getpwuid(uid);
+	if (! original_pw)
 		err(1, "getpwuid failed");
-	if (strlcpy(myname, pw->pw_name, sizeof(myname)) >= sizeof(myname))
+	if (strlcpy(myname, original_pw->pw_name, sizeof(myname)) >= sizeof(myname))
 		errx(1, "pw_name too long");
 
 	ngroups = getgroups(NGROUPS_MAX, groups);
@@ -390,7 +390,7 @@ main(int argc, char **argv)
 	if (sflag) {
 		sh = getenv("SHELL");
 		if (sh == NULL || *sh == '\0') {
-			shargv[0] = strdup(pw->pw_shell);
+			shargv[0] = strdup(original_pw->pw_shell);
 			if (shargv[0] == NULL)
 				err(1, NULL);
 		} else
@@ -540,12 +540,12 @@ main(int argc, char **argv)
 	if (pledge("stdio rpath getpw exec id", NULL) == -1)
 		err(1, "pledge");
         */
-	pw = getpwuid(target);
-	if (!pw)
+	target_pw = getpwuid(target);
+	if (! target_pw)
 		errx(1, "no passwd entry for target");
 
 #if defined(HAVE_LOGIN_CAP_H)
-	if (setusercontext(NULL, pw, target, LOGIN_SETGROUP |
+	if (setusercontext(NULL, target_pw, target, LOGIN_SETGROUP |
 	    LOGIN_SETPRIORITY | LOGIN_SETRESOURCES | LOGIN_SETUMASK |
 	    LOGIN_SETUSER) != 0)
 		errx(1, "failed to set user context for target");
@@ -574,9 +574,9 @@ main(int argc, char **argv)
 #endif
 
 	syslog(LOG_AUTHPRIV | LOG_INFO, "%s ran command %s as %s from %s",
-	    myname, cmdline, pw->pw_name, cwd);
+	    myname, cmdline, target_pw->pw_name, cwd);
 
-	envp = prepenv(rule);
+	envp = prepenv(rule, original_pw, target_pw);
 
 	if (rule->cmd) {
 		if (setenv("PATH", safepath, 1) == -1)

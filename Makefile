@@ -3,7 +3,9 @@ YACC?=yacc
 BIN=doas
 PREFIX?=/usr/local
 OBJECTS=doas.o env.o execvpe.o reallocarray.o y.tab.o
-CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${PREFIX}/etc/doas.conf\" 
+# Can set GLOBAL_PATH here to set PATH for target user.
+# TARGETPATH=-DGLOBAL_PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\"
+CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${PREFIX}/etc/doas.conf\" $(TARGETPATH) 
 LDFLAGS+=-lpam
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -31,7 +33,7 @@ y.tab.o: parse.y
 	$(YACC) parse.y
 	$(CC) $(CFLAGS) -c y.tab.c
 
-install: all
+install: $(BIN)
 	mkdir -p $(PREFIX)/bin
 	cp $(BIN) $(PREFIX)/bin/
 	chmod 4755 $(PREFIX)/bin/$(BIN)

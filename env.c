@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pwd.h>
 #include <err.h>
 #include <unistd.h>
 #include <errno.h>
@@ -77,8 +78,19 @@ freenode(struct envnode *node)
 	free(node);
 }
 
+static void
+addnode(struct env *env, const char *key, const char *value)
+{
+	struct envnode *node;
+
+	node = createnode(key, value);
+	RB_INSERT(envtree, &env->root, node);
+	env->count++;
+}
+
+
 static struct env *
-createenv(struct rule *rule)
+createenv(struct rule *rule, struct passwd *original, struct passwd *target)
 {
 	struct env *env;
 	u_int i;
@@ -88,6 +100,13 @@ createenv(struct rule *rule)
 		err(1, NULL);
 	RB_INIT(&env->root);
 	env->count = 0;
+
+        addnode(env, "DOAS_USER", original->pw_name);
+	addnode(env, "HOME", target->pw_dir);
+	addnode(env, "LOGNAME", target->pw_name);
+	addnode(env, "PATH", GLOBAL_PATH); 
+	addnode(env, "SHELL", target->pw_shell);
+	addnode(env, "USER", target->pw_name);
 
 	if (rule->options & KEEPENV) {
                 #ifndef linux
@@ -197,16 +216,15 @@ fillenv(struct env *env, const char **envlist)
 }
 
 char **
-prepenv(struct rule *rule)
+prepenv(struct rule *rule, struct passwd *original, struct passwd *target)
 {
-	static const char *safeset[] = {
-		"DISPLAY", "HOME", "LOGNAME", "MAIL",
-		"PATH", "TERM", "USER", "USERNAME",
-		NULL
-	};
+        static const char *safeset[] = {
+                "DISPLAY", "TERM", NULL
+        };
+
 	struct env *env;
 
-	env = createenv(rule);
+	env = createenv(rule, original, target);
 
 	/* if we started with blank, fill some defaults then apply rules */
 	if (!(rule->options & KEEPENV))
