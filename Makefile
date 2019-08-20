@@ -2,10 +2,12 @@ CC?=clang
 YACC?=yacc
 BIN=doas
 PREFIX?=/usr/local
+MANDIR?=$(DESTDIR)$(PREFIX)/man
+SYSCONFDIR?=$(DESTDIR)$(PREFIX)/etc
 OBJECTS=doas.o env.o execvpe.o reallocarray.o y.tab.o
 # Can set GLOBAL_PATH here to set PATH for target user.
 # TARGETPATH=-DGLOBAL_PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\"
-CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${PREFIX}/etc/doas.conf\" $(TARGETPATH) 
+CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${SYSCONFDIR}/doas.conf\" $(TARGETPATH)
 LDFLAGS+=-lpam
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -34,13 +36,13 @@ y.tab.o: parse.y
 	$(CC) $(CFLAGS) -c y.tab.c
 
 install: $(BIN)
-	mkdir -p $(PREFIX)/bin
-	cp $(BIN) $(PREFIX)/bin/
-	chmod 4755 $(PREFIX)/bin/$(BIN)
-	mkdir -p $(PREFIX)/man/man1
-	cp doas.1 $(PREFIX)/man/man1/
-	mkdir -p $(PREFIX)/man/man5
-	cp doas.conf.5 $(PREFIX)/man/man5/
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	cp $(BIN) $(DESTDIR)$(PREFIX)/bin/
+	chmod 4755 $(DESTDIR)$(PREFIX)/bin/$(BIN)
+	mkdir -p $(MANDIR)/man1
+	cp doas.1 $(MANDIR)/man1/
+	mkdir -p $(MANDIR)/man5
+	cp doas.conf.5 $(MANDIR)/man5/
 
 clean:
 	rm -f $(BIN) $(OBJECTS) y.tab.c
