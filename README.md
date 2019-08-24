@@ -36,7 +36,7 @@ Note: The doas command is in the pkgsrc collection and can be installed either v
       cd /usr/pkgsrc/security/doas
       make clean; make install
 
-or via binary package if available for your Operating System and architecture or port.
+or via binary package if available for your operating system and architecture or port.
 
 3 - The doas configuration file is located at /usr/local/etc/doas.conf. To create a rule allowing a user to perform admin actions, add a line to the configuration file. Details on how to do this are covered in the doas.conf manual page. However, most of the time a rule is as simple as
 
