@@ -59,6 +59,10 @@ char **prepenv(struct rule *, struct passwd *original, struct passwd *target);
 #define _PW_NAME_LEN 32
 #endif
 
+#ifndef SAFE_PATH
+#define SAFE_PATH "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
+#endif
+
 void *reallocarray(void *ptr, size_t nmemb, size_t size);
 
 #if !defined(HAVE_EXECVPE)
@@ -70,3 +74,4 @@ void errc(int eval, int code, const char *format);
 size_t strlcat(char *dst, const char *src, size_t dsize);
 size_t strlcpy(char *dst, const char *src, size_t dsize);
 #endif
+

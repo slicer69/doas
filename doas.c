@@ -24,13 +24,6 @@
 #endif
 
 #include <limits.h>
-/*
-#include <login_cap.h>
-#include <bsd_auth.h>
-*/
-#ifdef __freebsd__
-#include <readpassphrase.h>
-#endif
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,23 +41,26 @@
 
 #if defined(USE_BSD_AUTH)
 #include <bsd_auth.h>
+#include <readpassphrase.h>
 #endif
 
 #if defined(USE_PAM)
 #include <security/pam_appl.h>
 
-#ifndef linux
+#if defined(OPENPAM) /* BSD, MacOS & certain Linux distros */
 #include <security/openpam.h>
 static struct pam_conv pamc = { openpam_ttyconv, NULL };
-#include <fcntl.h>
-#endif // BSD using PAM
 
-#ifdef linux
+#elif defined(__LINUX_PAM__) /* Linux */
 #include <security/pam_misc.h>
 static struct pam_conv pamc = { misc_conv, NULL };
-#endif // Linux using PAM
 
-#endif // PAM
+#elif defined(SOLARIS_PAM) /* illumos & Solaris */
+#include "pm_pam_conv.h"
+static struct pam_conv pamc = { pam_tty_conv, NULL };
+
+#endif /* OPENPAM */
+#endif /* USE_PAM */
 
 #include "doas.h"
 
@@ -95,11 +91,11 @@ parseuid(const char *s, uid_t *uid)
 		*uid = pw->pw_uid;
 		return 0;
 	}
-        #ifdef __freebsd__ 
+	#if !defined(__linux__) && !defined(__NetBSD__)
 	*uid = strtonum(s, 0, UID_MAX, &errstr);
-        #else
-        sscanf(s, "%d", uid);
-        #endif
+	#else
+	sscanf(s, "%d", uid);
+	#endif
 	if (errstr)
 		return -1;
 	return 0;
@@ -127,11 +123,11 @@ parsegid(const char *s, gid_t *gid)
 		*gid = gr->gr_gid;
 		return 0;
 	}
-        #ifdef __freebsd__
+	#if !defined(__linux__) && !defined(__NetBSD__)
 	*gid = strtonum(s, 0, GID_MAX, &errstr);
-        #else
-        sscanf(s, "%d", gid);
-        #endif
+	#else
+	sscanf(s, "%d", gid);
+	#endif
 	if (errstr)
 		return -1;
 	return 0;
@@ -228,18 +224,16 @@ checkconfig(const char *confpath, int argc, char **argv,
 	struct rule *rule;
         int status;
 
-        #ifdef linux
+	#if defined(__linux__) || defined(__FreeBSD__)
 	status = setresuid(uid, uid, uid);
-        #elif __freebsd__
-	status = setresuid(uid, uid, uid);
-        #else
-        status = setreuid(uid, uid);
-        #endif
-        if (status == -1)
-        {
-           printf("doas: Unable to set UID\n");
-           exit(1);
-        }
+	#else
+	status = setreuid(uid, uid);
+	#endif
+	if (status == -1)
+	{
+		printf("doas: Unable to set UID\n");
+		exit(1);
+	}
 	parseconfig(confpath, 0);
 	if (!argc)
 		exit(0);
@@ -305,8 +299,7 @@ good:
 int
 main(int argc, char **argv)
 {
-	const char *safepath = "/bin:/sbin:/usr/bin:/usr/sbin:"
-	    "/usr/local/bin:/usr/local/sbin";
+	const char *safepath = SAFE_PATH;
 	const char *confpath = NULL;
 	char *shargv[] = { NULL, NULL };
 	char *sh;
@@ -327,13 +320,13 @@ main(int argc, char **argv)
 	char *login_style = NULL;
 	char **envp;
 
-        #ifndef linux
+	#ifndef linux
 	setprogname("doas");
-        #endif
+	#endif
 
-        #ifndef linux
+	#ifndef linux
 	closefrom(STDERR_FILENO + 1);
-        #endif
+	#endif
 
 	uid = getuid();
 
@@ -520,7 +513,7 @@ main(int argc, char **argv)
 		}
 		pam_end(pamh, pam_err);
 
-#ifndef linux 
+#ifndef linux
 		/* Re-establish stdin */
 		if (dup2(temp_stdin, STDIN_FILENO) == -1)
 			err(1, "dup2");

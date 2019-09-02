@@ -40,6 +40,11 @@
 #include <string.h>
 #include <unistd.h>
 
+#if defined(__sun)
+#include <strings.h>
+#include <alloca.h>
+#endif
+
 #include "doas.h"
 
 int
