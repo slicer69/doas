@@ -19,6 +19,14 @@ ifeq ($(UNAME_S),FreeBSD)
     CFLAGS+=-DHAVE_LOGIN_CAP_H
     LDFLAGS+=-lutil
 endif
+ifeq ($(UNAME_S),SunOS)
+    CPPFLAGS+=-Icompat -include compat.h
+    SAFE_PATH?=/bin:/sbin:/usr/bin:/usr/sbin:$(PREFIX)/bin:$(PREFIX)/sbin
+    GLOBAL_PATH?=/bin:/sbin:/usr/bin:/usr/sbin:$(PREFIX)/bin:$(PREFIX)/sbin
+    CFLAGS+=-DSOLARIS_PAM -DSAFE_PATH=\"$(SAFE_PATH)\" -DGLOBAL_PATH=\"$(GLOBAL_PATH)\"
+    COMPAT=errc.o pm_pam_conv.o setresuid.o verrc.o
+    OBJECTS+=$(COMPAT:%.o=compat/%.o)
+endif
 
 all: $(OBJECTS)
 	$(CC) -o $(BIN) $(OBJECTS) $(LDFLAGS)
