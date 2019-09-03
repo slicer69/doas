@@ -76,7 +76,10 @@ usage(void)
 void
 errc(int eval, int code, const char *format)
 {
-   fprintf(stderr, "%s", format);
+   if (format)
+      fprintf(stderr, "%s", format);
+    else
+      fprintf(stderr, "doas: Permission error encountered. Your user may not have access to perform this action.\n");
    exit(code);
 }
 #endif
