@@ -60,7 +60,7 @@ execvpe(const char *name, char *const *argv, char *const *envp)
 	/*
 	 * Do not allow null name
 	 */
-	if (name == NULL || *name == '\0') {
+	if ( (! name) || (*name == '\0') ){
 		errno = ENOENT;
 		return (-1);
  	}

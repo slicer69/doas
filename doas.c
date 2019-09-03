@@ -329,7 +329,9 @@ main(int argc, char **argv)
 	int nflag = 0;
 	char cwdpath[PATH_MAX];
 	const char *cwd;
+        #if defined(USE_BSD_AUTH)
 	char *login_style = NULL;
+        #endif
 	char **envp;
 
 	#ifndef linux
@@ -343,11 +345,12 @@ main(int argc, char **argv)
 	uid = getuid();
 
 	while ((ch = getopt(argc, argv, "a:C:nsu:")) != -1) {
-/*	while ((ch = getopt(argc, argv, "a:C:Lnsu:")) != -1) { */
 		switch (ch) {
+                #if defined(USE_BSD_AUTH)
 		case 'a':
 			login_style = optarg;
 			break;
+                #endif
 		case 'C':
 			confpath = optarg;
 			break;
