@@ -5,9 +5,10 @@ PREFIX?=/usr/local
 MANDIR?=$(DESTDIR)$(PREFIX)/man
 SYSCONFDIR?=$(DESTDIR)$(PREFIX)/etc
 OBJECTS=doas.o env.o execvpe.o reallocarray.o y.tab.o
+OPT?=-O2
 # Can set GLOBAL_PATH here to set PATH for target user.
 # TARGETPATH=-DGLOBAL_PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\"
-CFLAGS+=-DUSE_PAM -DDOAS_CONF=\"${SYSCONFDIR}/doas.conf\" $(TARGETPATH)
+CFLAGS+=-Wall $(OPT) -DUSE_PAM -DDOAS_CONF=\"${SYSCONFDIR}/doas.conf\" $(TARGETPATH)
 LDFLAGS+=-lpam
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)

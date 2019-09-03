@@ -85,7 +85,11 @@ static int
 parseuid(const char *s, uid_t *uid)
 {
 	struct passwd *pw;
-	const char *errstr;
+	#if !defined(__linux__) && !defined(__NetBSD__)
+	const char *errstr = NULL;
+        #else
+        int status;
+        #endif
 
 	if ((pw = getpwnam(s)) != NULL) {
 		*uid = pw->pw_uid;
@@ -93,11 +97,13 @@ parseuid(const char *s, uid_t *uid)
 	}
 	#if !defined(__linux__) && !defined(__NetBSD__)
 	*uid = strtonum(s, 0, UID_MAX, &errstr);
-	#else
-	sscanf(s, "%d", uid);
-	#endif
 	if (errstr)
 		return -1;
+	#else
+	status = sscanf(s, "%d", uid);
+        if (status != 1)
+           return -1;
+	#endif
 	return 0;
 }
 
@@ -117,7 +123,11 @@ static int
 parsegid(const char *s, gid_t *gid)
 {
 	struct group *gr;
-	const char *errstr;
+	#if !defined(__linux__) && !defined(__NetBSD__)
+	const char *errstr = NULL;
+        #else
+        int status;
+        #endif
 
 	if ((gr = getgrnam(s)) != NULL) {
 		*gid = gr->gr_gid;
@@ -125,11 +135,13 @@ parsegid(const char *s, gid_t *gid)
 	}
 	#if !defined(__linux__) && !defined(__NetBSD__)
 	*gid = strtonum(s, 0, GID_MAX, &errstr);
-	#else
-	sscanf(s, "%d", gid);
-	#endif
 	if (errstr)
 		return -1;
+	#else
+	status = sscanf(s, "%d", gid);
+        if (status != 1)
+            return -1;
+	#endif
 	return 0;
 }
 
