@@ -542,6 +542,23 @@ main(int argc, char **argv)
 	    LOGIN_SETPRIORITY | LOGIN_SETRESOURCES | LOGIN_SETUMASK |
 	    LOGIN_SETUSER) != 0)
 		errx(1, "failed to set user context for target");
+#else
+	#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__)
+	if (setresgid(target_pw->pw_gid, target_pw->pw_gid, target_pw->pw_gid) == -1)
+		err(1, "setresgid");
+	#else
+	if (setregid(target_pw->pw_gid, target_pw->pw_gid) == -1)
+		err(1, "setregid");
+	#endif
+	if (initgroups(target_pw->pw_name, target_pw->pw_gid) == -1)
+		err(1, "initgroups");
+	#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__)
+	if (setresuid(target, target, target) == -1)
+		err(1, "setresuid");
+	#else
+	if (setreuid(target, target) == -1)
+		err(1, "setreuid");
+	#endif
 #endif
         /*
 	if (pledge("stdio rpath exec", NULL) == -1)
@@ -557,14 +574,6 @@ main(int argc, char **argv)
         if (pledge("stdio exec", NULL) == -1)
 		err(1, "pledge");
         */
-#ifndef HAVE_LOGIN_CAP_H
-        /* If we effectively are root, set the UID to actually be root to avoid
-           permission errors. */
-        if (target != 0)
-           setuid(target);
-        if ( geteuid() == ROOT_UID )
-           setuid(ROOT_UID);
-#endif
 
 	syslog(LOG_AUTHPRIV | LOG_INFO, "%s ran command %s as %s from %s",
 	    myname, cmdline, target_pw->pw_name, cwd);
