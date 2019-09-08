@@ -39,13 +39,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#if defined(__sun)
 #include <strings.h>
+
+#if defined(__sun) || defined(__linux__)
 #include <alloca.h>
 #endif
-
-#include "doas.h"
 
 int
 execvpe(const char *name, char *const *argv, char *const *envp)

@@ -1,5 +1,6 @@
+/* $OpenBSD: getprogname.c,v 1.4 2016/03/13 18:34:20 guenther Exp $ */
 /*
- * Copyright (c) 2012 Darren Tucker (dtucker at zip com au).
+ * Copyright (c) 2013 Antoine Jacoutot <ajacoutot@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,20 +15,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* setresuid.c original: openssh-portable/openbsd-compat/bsd-setres_id.c */
+#include <stdlib.h>
 
-#include <sys/types.h>
-
-#include <unistd.h>
-#include <errno.h>
-
-int
-setresuid(uid_t ruid, uid_t euid, uid_t suid)
+const char *
+getprogname(void)
 {
-	if (ruid != suid) {
-		errno = ENOSYS;
-		return -1;
-	}
-
-	return setreuid(ruid, euid);
+	return (__progname);
 }
