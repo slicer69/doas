@@ -72,42 +72,16 @@ usage(void)
 	exit(1);
 }
 
-#ifdef linux
-void
-errc(int eval, int code, const char *format)
-{
-   if (format)
-      fprintf(stderr, "%s", format);
-    else
-      fprintf(stderr, "doas: Permission error encountered. Your user may not have access to perform this action.\n");
-   exit(code);
-}
-#endif
-
 static int
 parseuid(const char *s, uid_t *uid)
 {
 	struct passwd *pw;
-	#if !defined(__linux__) && !defined(__NetBSD__)
-	const char *errstr = NULL;
-        #else
-        int status;
-        #endif
-
-	if ((pw = getpwnam(s)) != NULL) {
+        pw = getpwnam(s);
+	if (pw != NULL) {
 		*uid = pw->pw_uid;
 		return 0;
 	}
-	#if !defined(__linux__) && !defined(__NetBSD__)
-	*uid = strtonum(s, 0, UID_MAX, &errstr);
-	if (errstr)
-		return -1;
-	#else
-	status = sscanf(s, "%d", uid);
-        if (status != 1)
-           return -1;
-	#endif
-	return 0;
+	return -1;
 }
 
 static int
@@ -126,26 +100,12 @@ static int
 parsegid(const char *s, gid_t *gid)
 {
 	struct group *gr;
-	#if !defined(__linux__) && !defined(__NetBSD__)
-	const char *errstr = NULL;
-        #else
-        int status;
-        #endif
-
-	if ((gr = getgrnam(s)) != NULL) {
+        gr = getgrnam(s);
+	if (gr != NULL) {
 		*gid = gr->gr_gid;
 		return 0;
 	}
-	#if !defined(__linux__) && !defined(__NetBSD__)
-	*gid = strtonum(s, 0, GID_MAX, &errstr);
-	if (errstr)
-		return -1;
-	#else
-	status = sscanf(s, "%d", gid);
-        if (status != 1)
-            return -1;
-	#endif
-	return 0;
+	return -1;
 }
 
 static int
@@ -245,10 +205,8 @@ checkconfig(const char *confpath, int argc, char **argv,
 	status = setreuid(uid, uid);
 	#endif
 	if (status == -1)
-	{
-		printf("doas: Unable to set UID\n");
-		exit(1);
-	}
+		errx(1, "unable to set uid to %d", uid);
+
 	parseconfig(confpath, 0);
 	if (!argc)
 		exit(0);
@@ -337,13 +295,9 @@ main(int argc, char **argv)
         #endif
 	char **envp;
 
-	#ifndef linux
 	setprogname("doas");
-	#endif
 
-	#ifndef linux
 	closefrom(STDERR_FILENO + 1);
-	#endif
 
 	uid = getuid();
 
@@ -561,7 +515,7 @@ main(int argc, char **argv)
 	    LOGIN_SETUSER) != 0)
 		errx(1, "failed to set user context for target");
 #else
-	#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__)
+	#if defined(__linux__) || defined(__FreeBSD__)
 	if (setresgid(target_pw->pw_gid, target_pw->pw_gid, target_pw->pw_gid) == -1)
 		err(1, "setresgid");
 	#else
@@ -570,7 +524,7 @@ main(int argc, char **argv)
 	#endif
 	if (initgroups(target_pw->pw_name, target_pw->pw_gid) == -1)
 		err(1, "initgroups");
-	#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__)
+	#if defined(__linux__) || defined(__FreeBSD__)
 	if (setresuid(target, target, target) == -1)
 		err(1, "setresuid");
 	#else

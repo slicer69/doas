@@ -63,15 +63,3 @@ char **prepenv(struct rule *, struct passwd *original, struct passwd *target);
 #define SAFE_PATH "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 #endif
 
-void *reallocarray(void *ptr, size_t nmemb, size_t size);
-
-#if !defined(HAVE_EXECVPE)
-int execvpe(const char *file, char * const *argv, char * const *envp);
-#endif	/* !HAVE_EXECVPE */
-
-#ifdef linux
-void errc(int eval, int code, const char *format);
-size_t strlcat(char *dst, const char *src, size_t dsize);
-size_t strlcpy(char *dst, const char *src, size_t dsize);
-#endif
-
