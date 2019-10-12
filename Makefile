@@ -31,6 +31,13 @@ ifeq ($(UNAME_S),SunOS)
     COMPAT=errc.o pm_pam_conv.o setresuid.o verrc.o
     OBJECTS+=$(COMPAT:%.o=compat/%.o)
 endif
+ifeq ($(UNAME_S),Darwin)
+    CPPFLAGS+=-Icompat
+    COMPAT+=bsd-closefrom.o
+    OBJECTS+=$(COMPAT:%.o=compat/%.o)
+    # On MacOS the default man page path is /usr/local/share/man
+    MANDIR=$(DESTDIR)$(PREFIX)/share/man
+endif
 
 all: $(OBJECTS)
 	$(CC) -o $(BIN) $(OBJECTS) $(LDFLAGS)

@@ -1,11 +1,11 @@
 # doas
-A port of OpenBSD's doas which runs on FreeBSD, Linux, NetBSD, and illumos
+A port of OpenBSD's doas which runs on FreeBSD, Linux, NetBSD, illumos and macOS.
 
 The doas utility is a program originally written for OpenBSD which allows a user to run a command as though they were another user. Typically doas is used to allow non-privleged users to run commands as though they were the root user. The doas program acts as an alternative to sudo, which is a popular method in the Linux community for granting admin access to specific users.
 
 The doas program offers two benefits over sudo: its configuration file has a simple syntax and it is smaller, requiring less effort to audit the code. This makes it harder for both admins and coders to make mistakes that potentially open security holes in the system.
 
-This port of doas has been made to work on FreeBSD 11.x and newer, most distributions of Linux, NetBSD 8.x and newer, and most illumos distributions (tested on OmniOS and SmartOS).
+This port of doas has been made to work on FreeBSD 11.x and newer, most distributions of Linux, NetBSD 8.x and newer, and most illumos distributions (tested on OmniOS and SmartOS). It also works on macOS Catalina.
 
 Installing doas is accomplished in three steps:
 1. Installing build tools.
@@ -14,7 +14,7 @@ Installing doas is accomplished in three steps:
 
 ## Installing build tools
 
-1 - The doas program has virtually no dependencies. So long as you have a compiler (such as the GNU Compiler or Clang) installed and GNU make (gmake on NetBSD, FreeBSD, and illumos). On illumos, the build-essential package will install all the necessary build tools. Linux may need libpam headers to compile which can be added with the libpam0g-dev package on Debian/Ubuntu.
+1 - The doas program has virtually no dependencies. So long as you have a compiler (such as the GNU Compiler or Clang) installed and GNU make (gmake on NetBSD, FreeBSD, and illumos). On illumos, the build-essential package will install all the necessary build tools. Linux may need libpam headers to compile which can be added with the libpam0g-dev package on Debian/Ubuntui. On macOS an installation of XCode is necessary, due to the missing cli development tools in the default installation.
 
 ## Compiling and installing
 
@@ -24,7 +24,7 @@ Installing doas is accomplished in three steps:
 
      make
     
-#### FreeBSD and NetBSD
+#### FreeBSD, NetBSD and macOS
 
      gmake
 
@@ -42,7 +42,7 @@ This builds the source code. Then, as the root user, run
 
      make install
 
-#### FreeBSD and NetBSD
+#### FreeBSD, NetBSD and macOS
 
      gmake install
 
