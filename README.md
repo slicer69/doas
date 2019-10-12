@@ -14,7 +14,7 @@ Installing doas is accomplished in three steps:
 
 ## Installing build tools
 
-1 - The doas program has virtually no dependencies. So long as you have a compiler (such as the GNU Compiler or Clang) installed and GNU make (gmake on NetBSD, FreeBSD, and illumos). On illumos, the build-essential package will install all the necessary build tools. Linux may need libpam headers to compile which can be added with the libpam0g-dev package on Debian/Ubuntui. On macOS an installation of XCode is necessary, due to the missing cli development tools in the default installation.
+1 - The doas program has virtually no dependencies. So long as you have a compiler (such as the GNU Compiler or Clang) installed and GNU make (gmake on NetBSD, FreeBSD, and illumos). On illumos, the build-essential package will install all the necessary build tools. Linux may need libpam headers to compile which can be added with the libpam0g-dev package on Debian/Ubuntu. On macOS an installation of XCode is necessary, due to the missing cli development tools in the default installation.
 
 ## Compiling and installing
 
