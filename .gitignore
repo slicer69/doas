@@ -1,0 +1,4 @@
+*.o
+*.final
+y.tab.c
+doas

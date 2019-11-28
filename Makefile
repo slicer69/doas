@@ -1,3 +1,4 @@
+AWK?=awk
 CC?=clang
 YACC?=yacc
 BIN=doas
@@ -39,7 +40,7 @@ ifeq ($(UNAME_S),Darwin)
     MANDIR=$(DESTDIR)$(PREFIX)/share/man
 endif
 
-all: $(OBJECTS)
+all: $(OBJECTS) doas.1.final doas.conf.5.final
 	$(CC) -o $(BIN) $(OBJECTS) $(LDFLAGS)
 
 env.o: doas.h env.c
@@ -59,10 +60,18 @@ install: $(BIN)
 	cp $(BIN) $(DESTDIR)$(PREFIX)/bin/
 	chmod 4755 $(DESTDIR)$(PREFIX)/bin/$(BIN)
 	mkdir -p $(MANDIR)/man1
-	cp doas.1 $(MANDIR)/man1/
+	cp doas.1.final $(MANDIR)/man1/doas.1
 	mkdir -p $(MANDIR)/man5
-	cp doas.conf.5 $(MANDIR)/man5/
+	cp doas.conf.5.final $(MANDIR)/man5/doas.conf.5
 
 clean:
 	rm -f $(BIN) $(OBJECTS) y.tab.c
+	rm -f *.final
 
+# Doing it this way allows to change the original files
+# only partially instead of renaming them.
+doas.1.final:
+	$(AWK) -v pfx="$(SYSCONFDIR)" '{gsub("@SUBSTSYSCONFDIR@",pfx); print $$0}' < doas.1 > doas.1.final
+
+doas.conf.5.final:
+	$(AWK) -v pfx="$(SYSCONFDIR)" '{gsub("@SUBSTSYSCONFDIR@",pfx); print $$0}' < doas.conf.5 > doas.conf.5.final
