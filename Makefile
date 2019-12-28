@@ -5,7 +5,7 @@ BIN=doas
 PREFIX?=/usr/local
 MANDIR?=$(DESTDIR)$(PREFIX)/man
 SYSCONFDIR?=$(DESTDIR)$(PREFIX)/etc
-OBJECTS=doas.o env.o compat/execvpe.o compat/reallocarray.o y.tab.o
+OBJECTS=doas.o env.o compat/execvpe.o compat/reallocarray.o y.tab.o 
 OPT?=-O2
 # Can set GLOBAL_PATH here to set PATH for target user.
 # TARGETPATH=-DGLOBAL_PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\"
@@ -66,7 +66,7 @@ install: $(BIN)
 
 clean:
 	rm -f $(BIN) $(OBJECTS) y.tab.c
-	rm -f *.final
+	rm -f *.final parse.o
 
 # Doing it this way allows to change the original files
 # only partially instead of renaming them.
