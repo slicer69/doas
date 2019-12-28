@@ -83,6 +83,32 @@ addnode(struct env *env, const char *key, const char *value)
 }
 
 
+/* Copy an original (possibly static in memory) password structure.
+Make a deep copy of it so that our original andtarget do not overlap
+on future calls.
+*/
+struct passwd *
+copyenvpw(struct passwd *my_static)
+{
+    struct passwd *new_pw;
+
+    if (! my_static)
+        return NULL;
+    new_pw = (struct passwd *) calloc(1, sizeof(struct passwd));
+    if (! new_pw)
+        return NULL;
+
+    new_pw->pw_name = strdup(my_static->pw_name);
+    new_pw->pw_passwd = strdup(my_static->pw_passwd);
+    new_pw->pw_uid = my_static->pw_uid;
+    new_pw->pw_gid = my_static->pw_gid;
+    new_pw->pw_gecos = strdup(my_static->pw_gecos);
+    new_pw->pw_dir = strdup(my_static->pw_dir);
+    new_pw->pw_shell = strdup(my_static->pw_shell);
+    return new_pw;
+}
+
+
 static struct env *
 createenv(struct rule *rule, struct passwd *original, struct passwd *target)
 {
@@ -96,7 +122,10 @@ createenv(struct rule *rule, struct passwd *original, struct passwd *target)
 	env->count = 0;
 
         addnode(env, "DOAS_USER", original->pw_name);
-	addnode(env, "HOME", target->pw_dir);
+	if (rule->options & KEEPENV)
+           addnode(env, "HOME", original->pw_dir);
+        else
+           addnode(env, "HOME", target->pw_dir);
 	addnode(env, "LOGNAME", target->pw_name);
 	addnode(env, "PATH", GLOBAL_PATH); 
 	addnode(env, "SHELL", target->pw_shell);

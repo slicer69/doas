@@ -279,7 +279,7 @@ main(int argc, char **argv)
 	const char *cmd;
 	char cmdline[LINE_MAX];
 	char myname[_PW_NAME_LEN + 1];
-	struct passwd *original_pw, *target_pw;
+	struct passwd *original_pw, *target_pw, *temp_pw; 
 	struct rule *rule;
 	uid_t uid;
 	uid_t target = 0;
@@ -341,7 +341,8 @@ main(int argc, char **argv)
 	} else if ((!sflag && !argc) || (sflag && argc))
 		usage();
 
-	original_pw = getpwuid(uid);
+	temp_pw = getpwuid(uid);
+        original_pw = copyenvpw(temp_pw);
 	if (! original_pw)
 		err(1, "getpwuid failed");
 	if (strlcpy(myname, original_pw->pw_name, sizeof(myname)) >= sizeof(myname))
@@ -505,10 +506,12 @@ main(int argc, char **argv)
 	if (pledge("stdio rpath getpw exec id", NULL) == -1)
 		err(1, "pledge");
         */
-	target_pw = getpwuid(target);
+	temp_pw = getpwuid(target);
+        target_pw = copyenvpw(temp_pw);
 	if (! target_pw)
 		errx(1, "no passwd entry for target");
 
+        
 #if defined(HAVE_LOGIN_CAP_H)
 	if (setusercontext(NULL, target_pw, target, LOGIN_SETGROUP |
 	    LOGIN_SETPRIORITY | LOGIN_SETRESOURCES | LOGIN_SETUMASK |

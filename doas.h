@@ -31,6 +31,7 @@ extern int parse_errors;
 
 struct passwd;
 char **prepenv(struct rule *, struct passwd *original, struct passwd *target);
+struct passwd *copyenvpw(struct passwd *original);
 
 #ifndef GLOBAL_PATH 
 #define GLOBAL_PATH "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
