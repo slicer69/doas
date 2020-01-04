@@ -1,0 +1,18 @@
+# Sample file for doas
+# Please see doas.conf manual page for information on setting
+# up a doas.conf file.
+
+# Permit members of the wheel group to perform actions as root.
+permit :wheel
+
+# Permit user alice to run commands a root user.
+permit alice as root
+
+# Permit user bob to run programs as root, maintaining
+# envrionment variables. Useful for GUI applications.
+permit keepenv bob as root
+
+# Permit user cindy to run only the pkg package manager as root
+# to perform package updates and upgrades.
+permit cindy as root cmd pkg update
+permit cindy as root cmd pkg upgrade
