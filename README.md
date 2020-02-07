@@ -42,9 +42,16 @@ This builds the source code. Then, as the root user, run
 
      make install
 
-#### FreeBSD, NetBSD and macOS
+#### FreeBSD and NetBSD 
 
      gmake install
+
+#### macOS
+
+     gmake install
+     cp /etc/pam.d/sudo /etc/pam.d/doas
+
+Note: By default macOS blocks doas from using PAM modules, causing doas authentication to fail. The cp command above copies the sudo PAM configuration into place for doas to use.
 
 #### illumos
 
