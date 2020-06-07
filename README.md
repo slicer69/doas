@@ -53,6 +53,11 @@ This builds the source code. Then, as the root user, run
 
 Note: By default macOS blocks doas from using PAM modules, causing doas authentication to fail. The cp command above copies the sudo PAM configuration into place for doas to use.
 
+Note to Linux users: Some Linux distributions, such as CentOS, will block doas from using PAM authentication by default. If this happens, it is usually possible to work around the issue by running the following command as the administrator:
+
+      cp /etc/pam.d/sudo /etc/pam.d/doas
+
+
 #### illumos
 
      PREFIX=/opt/local gmake install
