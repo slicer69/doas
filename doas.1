@@ -21,7 +21,7 @@
 .Nd execute commands as another user
 .Sh SYNOPSIS
 .Nm doas
-.Op Fl ns
+.Op Fl nSs
 .Op Fl a Ar style
 .Op Fl C Ar config
 .Op Fl u Ar user
@@ -35,7 +35,8 @@ utility executes the given command as another user.
 The
 .Ar command
 argument is mandatory unless
-.Fl C
+.Fl C ,
+.Fl S ,
 or
 .Fl s
 is specified.
@@ -72,6 +73,10 @@ No command is executed.
 Non interactive mode, fail if
 .Nm
 would prompt for password.
+.It Fl S
+Same as
+.Fl s
+but simulates a full login.
 .It Fl s
 Execute the shell from
 .Ev SHELL
