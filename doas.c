@@ -67,7 +67,7 @@ static struct pam_conv pamc = { pam_tty_conv, NULL };
 static void 
 usage(void)
 {
-	fprintf(stderr, "usage: doas [-ns] [-a style] [-C config] [-u user]"
+	fprintf(stderr, "usage: doas [-nSs] [-a style] [-C config] [-u user]"
 	    " command [args]\n");
 	exit(1);
 }
@@ -286,6 +286,7 @@ main(int argc, char **argv)
 	gid_t groups[NGROUPS_MAX + 1];
 	int ngroups;
 	int i, ch;
+	int Sflag = 0;
 	int sflag = 0;
 	int nflag = 0;
 	char cwdpath[PATH_MAX];
@@ -301,7 +302,7 @@ main(int argc, char **argv)
 
 	uid = getuid();
 
-	while ((ch = getopt(argc, argv, "a:C:nsu:")) != -1) {
+	while ((ch = getopt(argc, argv, "a:C:nSsu:")) != -1) {
 		switch (ch) {
                 #if defined(USE_BSD_AUTH)
 		case 'a':
@@ -324,6 +325,8 @@ main(int argc, char **argv)
 		case 'n':
 			nflag = 1;
 			break;
+		case 'S':
+			Sflag = 1;	
 		case 's':
 			sflag = 1;
 			break;
@@ -391,6 +394,10 @@ main(int argc, char **argv)
 		syslog(LOG_AUTHPRIV | LOG_NOTICE,
 		    "failed command for %s: %s", myname, cmdline);
 		errc(1, EPERM, NULL);
+	}
+
+	if (Sflag) {
+		argv[0] = "-doas";
 	}
 
 	if (!(rule->options & NOPASS)) {
