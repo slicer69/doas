@@ -302,7 +302,7 @@ main(int argc, char **argv)
 
 	uid = getuid();
 
-	while ((ch = getopt(argc, argv, "a:C:nSsu:")) != -1) {
+	while ((ch = getopt(argc, argv, "+a:C:nSsu:")) != -1) {
 		switch (ch) {
                 #if defined(USE_BSD_AUTH)
 		case 'a':

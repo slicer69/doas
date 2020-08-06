@@ -89,6 +89,6 @@ Create a new file in the root user's home:
 
      doas touch /root/new-file
 
-On Linux commands with arguments should be prefixed by a double-dash (--). Here we remove a directory owned by root:
+On Linux versions of doas prior to 6.3p1 required commands with arguments to be prefixed by a double-dash (--). From 6.3p1 and onward the double-dash is no longer required. Here we remove a directory owned by root:
 
      doas -- rm -rf old-directory
