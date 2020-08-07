@@ -1,0 +1,50 @@
+#!/bin/sh
+
+tmpdoas=/tmp/doas.conf
+installeddoas=/usr/local/etc/doas.conf
+defaulteditor=/usr/bin/vi
+doasexec=/usr/local/bin/doas
+
+# Check to make sure we have an editor
+if [ ! -x "$EDITOR" ]
+then
+   echo "No default editor, assuming vi."
+   EDITOR=$defaulteditor
+fi
+
+if [ ! -x "$EDITOR" ]
+then
+  echo "Could not find an editor."
+  exit 1
+fi
+
+# Check to see if existing temporary doas.conf file exists.
+if [ -f "$tmpdoas" ]
+then
+   echo "Someone is already working on the doas.conf file."
+   exit 2
+fi
+
+# Check to see if an existing configuration file is installed.
+if [ -f "$installeddoas" ]
+then
+   cp "$installeddoas" "$tmpdoas"
+   $EDITOR "$tmpdoas"
+fi
+
+doas -C "$tmpdoas"
+status=$?
+while [ $status -ge 1 ]
+do
+   echo "An error was found in the configuration file. Please fix doas.conf."
+   read status
+   $EDITOR "$tmpdoas"
+   doas -C "$tmpdoas"
+   status=$?
+done
+
+echo "Parsing check of doas.conf passed. Installing new copy of doas.conf."
+$doasexec cp "$tmpdoas" "$installeddoas"
+rm -f "$tmpdoas"
+exit 0
+

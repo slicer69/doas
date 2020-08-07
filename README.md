@@ -79,6 +79,14 @@ Where <user> is the username of the person who is being granted root access. For
 
 Additional users can be added to the file, one per line.
 
+Please note that a shell script, vidoas, is included with the doas program. The vidoas
+script can be run as a regular user and will perform a syntax check on the doas.conf
+file before installing it on the system. This avoids breaking the doas.conf file. The
+vidoas script accepts no parameters and can be simply run as
+
+      vidoas
+
+
 To make use of doas, run it in front of any command. Here are some examples:
 
 Confirm doas is working by printing our effective user ID:

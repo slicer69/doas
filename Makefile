@@ -58,6 +58,7 @@ y.tab.o: parse.y
 install: $(BIN)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	cp $(BIN) $(DESTDIR)$(PREFIX)/bin/
+	cp vidoas $(DESTDIR)$(PREFIX)/bin/
 	chmod 4755 $(DESTDIR)$(PREFIX)/bin/$(BIN)
 	mkdir -p $(MANDIR)/man1
 	cp doas.1.final $(MANDIR)/man1/doas.1
