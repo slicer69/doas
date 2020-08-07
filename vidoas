@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# This script edits a temporary copy of the doas.conf file and
+# automatically checks it for syntax errors before installing
+# the new copy of doas.conf.
+
 tmpdoas=/tmp/doas.conf
 installeddoas=/usr/local/etc/doas.conf
 defaulteditor=/usr/bin/vi
