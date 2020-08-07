@@ -125,6 +125,11 @@ as a result, comments may not be extended over multiple lines.
 If quotes or backslashes are used in a word,
 it is not considered a keyword.
 .El
+.Sh NOTES
+To make editing the doas.conf file safer, a convenience script called
+vidoas is included with the doas software. This script can be run as
+a regular user and automatically checks the syntax of the doas.conf file
+before installing it on the system.
 .Sh EXAMPLES
 The following example permits users in group wsrc to build ports;
 wheel to execute commands as any user while keeping the environment
