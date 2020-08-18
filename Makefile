@@ -65,6 +65,12 @@ install: $(BIN)
 	mkdir -p $(MANDIR)/man5
 	cp doas.conf.5.final $(MANDIR)/man5/doas.conf.5
 
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/doas
+	rm -f $(DESTDIR)$(PREFIX)/bin/vidoas
+	rm -f $(MANDIR)/man1/doas.1
+	rm -f $(MANDIR)/man5/doas.conf.5
+
 clean:
 	rm -f $(BIN) $(OBJECTS) y.tab.c
 	rm -f *.final parse.o
