@@ -16,7 +16,7 @@ Installing doas is accomplished in three steps:
 
 1 - The doas program has virtually no dependencies. So long as you have a compiler (such as the GNU Compiler or Clang) installed and GNU make (gmake on NetBSD, FreeBSD, and illumos). On illumos, the build-essential package will install all the necessary build tools. 
 
-#### Ubuntu
+#### Debian and Ubuntu based distributions
 
      sudo apt install build-essential make bison flex libpam0g-dev 
     
