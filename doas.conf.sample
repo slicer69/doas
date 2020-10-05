@@ -9,7 +9,7 @@ permit :wheel
 permit alice as root
 
 # Permit user bob to run programs as root, maintaining
-# envrionment variables. Useful for GUI applications.
+# environment variables. Useful for GUI applications.
 permit keepenv bob as root
 
 # Permit user cindy to run only the pkg package manager as root
