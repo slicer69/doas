@@ -13,7 +13,9 @@ extern const char *__progname;
 
 const char *getprogname(void);
 
+#if !defined(__NetBSD__)
 void *reallocarray(void *optr, size_t nmemb, size_t size);
+#endif
 
 void setprogname(const char *progname);
 
