@@ -24,6 +24,11 @@ ifeq ($(UNAME_S),FreeBSD)
     CFLAGS+=-DHAVE_LOGIN_CAP_H
     LDFLAGS+=-lutil
 endif
+ifeq ($(UNAME_S),NetBSD)
+    CFLAGS+=-DHAVE_LOGIN_CAP_H -D_OPENBSD_SOURCE
+    OBJECTS=doas.o env.o y.tab.o
+    LDFLAGS+=-lutil
+endif
 ifeq ($(UNAME_S),SunOS)
     SAFE_PATH?=/bin:/sbin:/usr/bin:/usr/sbin:$(PREFIX)/bin:$(PREFIX)/sbin
     GLOBAL_PATH?=/bin:/sbin:/usr/bin:/usr/sbin:$(PREFIX)/bin:$(PREFIX)/sbin
