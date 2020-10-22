@@ -4,51 +4,104 @@
 # automatically checks it for syntax errors before installing
 # the new copy of doas.conf.
 
-tmpdoas=/tmp/doas.conf
-installeddoas=/usr/local/etc/doas.conf
-defaulteditor=/usr/bin/vi
-doasexec=/usr/local/bin/doas
+set -eu
 
-# Check to make sure we have an editor
-if [ ! -x "$EDITOR" ]
-then
-   echo "No default editor, assuming vi."
-   EDITOR=$defaulteditor
-fi
+PATH=/bin:/usr/bin:/usr/local/bin
+export PATH
 
-if [ ! -x "$EDITOR" ]
+PROG="${0##*/}"
+
+umask 077
+
+WRK_DIR=/var/tmp
+INSTALL_DIR=/usr/local/etc
+
+doas_conf_mode=0644
+
+doas_lock_file="${WRK_DIR}/doas.conf"
+installed_doas="${INSTALL_DIR}/doas.conf"
+
+die()
+{
+    echo "${PROG}: ${@}" 1>&2
+    exit 1
+}
+
+warn()
+{
+    echo "${PROG}: ${@}" 1>&2
+}
+
+get_intr()
+{
+    stty -a \
+    | sed -En '
+	/^(.* )?intr = / {
+	    s///
+	    s/;.*$//
+	    p
+	}
+    '
+}
+
+set_trap_rm()
+{
+    local file file_list
+    file_list=
+    for file
+    do
+	file_list="${file_list} '${file}'"
+    done
+    if [ -n "${file_list}" ]
+    then
+	trap "rm -f ${file_list}" 0 1 2 15
+    fi
+}
+
+tmp_doas="$(mktemp "${WRK_DIR}/doas.conf.XXXXXXXXXX")"
+set_trap_rm "${tmp_doas}"
+
+# Check to see if an existing configuration file is installed.
+if [ -f "${installed_doas}" ]
 then
-  echo "Could not find an editor."
-  exit 1
+    if [ -r "${installed_doas}" ]
+    then
+	cp "${installed_doas}" "${tmp_doas}"
+    else
+	die "Cannot read ${installed_doas}"
+    fi
 fi
 
 # Check to see if existing temporary doas.conf file exists.
-if [ -f "$tmpdoas" ]
+if ln "${tmp_doas}" "${doas_lock_file}"
 then
-   echo "Someone is already working on the doas.conf file."
-   exit 2
+    set_trap_rm "${tmp_doas}" "${doas_lock_file}"
+else
+    die "The doas.conf file is already locked"
 fi
 
-# Check to see if an existing configuration file is installed.
-if [ -f "$installeddoas" ]
-then
-   cp "$installeddoas" "$tmpdoas"
-   $EDITOR "$tmpdoas"
-fi
+"${EDITOR:-vi}" "${tmp_doas}" || true
 
-doas -C "$tmpdoas"
-status=$?
-while [ $status -ge 1 ]
+while ! doas -C "${tmp_doas}"
 do
-   echo "An error was found in the configuration file. Please fix doas.conf."
-   read status
-   $EDITOR "$tmpdoas"
-   doas -C "$tmpdoas"
-   status=$?
+    warn "Press enter to edit doas.conf again to fix it,"
+    warn "or interrupt ($(get_intr)) to cancel."
+    read status
+    "${EDITOR:-vi}" "${tmp_doas}" || true
 done
 
-echo "Parsing check of doas.conf passed. Installing new copy of doas.conf."
-$doasexec cp "$tmpdoas" "$installeddoas"
-rm -f "$tmpdoas"
-exit 0
-
+if [ -s "${tmp_doas}" ]
+then
+    if cmp -s "${tmp_doas}" "${installed_doas}"
+    then
+	warn "No changes made"
+	warn "${installed_doas} unchanged"
+    else
+	doas install -r -m "${doas_conf_mode}" \
+	    "${tmp_doas}" "${installed_doas}" \
+	&& warn "${installed_doas} updated"
+    fi
+else
+    warn "Not installing an empty doas.conf file"
+    warn "${installed_doas} unchanged"
+fi
