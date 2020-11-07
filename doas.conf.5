@@ -130,6 +130,24 @@ To make editing the doas.conf file safer, a convenience script called
 vidoas is included with the doas software. This script can be run as
 a regular user and automatically checks the syntax of the doas.conf file
 before installing it on the system.
+
+Please take note that it is a bad idea to assign permission to users
+implicitly, even if blocking/denying exceptions are made. For instance, try
+to avoid using rules like 
+.Bd -literal -offset indent
+permit susan as
+deny susan as root
+
+.Ed
+The above example uses two rules to permit Susan to switch to any user, except
+root. This is dangerous for two reasons. First, it means if new users,
+including ones with admin access, are added to the system later then
+Susan can use their accounts. It also means if the file is truncated or
+accessed while being updated the doas program may read the first rule
+before the second has been written, giving Susan access to everything,
+including the root account. The better approach to is explicity allow Susan
+to access only specific accounts she needs to use.
+
 .Sh EXAMPLES
 The following example permits users in group wsrc to build ports;
 wheel to execute commands as any user while keeping the environment
