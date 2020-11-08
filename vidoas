@@ -1,8 +1,6 @@
 #!/bin/sh
-
-# This script edits a temporary copy of the doas.conf file and
-# automatically checks it for syntax errors before installing
-# the new copy of doas.conf.
+# Edit a temporary copy of the doas.conf file and check it for syntax
+# errors before installing it as the actual doas.conf file.
 
 set -eu
 
@@ -11,15 +9,10 @@ export PATH
 
 PROG="${0##*/}"
 
-umask 077
+umask 022
 
-WRK_DIR=/var/tmp
-INSTALL_DIR=/usr/local/etc
-
-doas_conf_mode=0644
-
-doas_lock_file="${WRK_DIR}/doas.conf"
-installed_doas="${INSTALL_DIR}/doas.conf"
+DOAS_CONF=@DOAS_CONF@
+doas_lock_file="${DOAS_CONF}.lck"
 
 die()
 {
@@ -58,27 +51,48 @@ set_trap_rm()
     fi
 }
 
-tmp_doas="$(mktemp "${WRK_DIR}/doas.conf.XXXXXXXXXX")"
+tmp_doas="$(mktemp "${DOAS_CONF}.XXXXXXXXXX")" \
+|| die "You probably need to run ${PROG} as root"
 set_trap_rm "${tmp_doas}"
 
-# Check to see if an existing configuration file is installed.
-if [ -f "${installed_doas}" ]
+# It is important that the ln(1) command fails if the target already
+# exists.  Some versions are known to behave like "ln -f" by default
+# (removing any existing target).  Adjust PATH to avoid such ln(1)
+# implementations.
+
+tmp_test_ln="$(mktemp "${DOAS_CONF}.XXXXXXXXXX")"
+set_trap_rm "${tmp_doas}" "${tmp_test_ln}"
+
+if ln "${tmp_doas}" "${tmp_test_ln}" 2>/dev/null
 then
-    if [ -r "${installed_doas}" ]
+    die 'ln(1) is not safe for lock files, bailing'
+fi
+
+# If a doas.conf file exists, copy it into the temporary file for
+# editing.  If none exist, the editor will open with an empty file.
+
+if [ -f "${DOAS_CONF}" ]
+then
+    if [ -r "${DOAS_CONF}" ]
     then
-	cp "${installed_doas}" "${tmp_doas}"
+	cp "${DOAS_CONF}" "${tmp_doas}"
     else
-	die "Cannot read ${installed_doas}"
+	die "Cannot read ${DOAS_CONF}"
     fi
 fi
 
-# Check to see if existing temporary doas.conf file exists.
+# Link the temporary file to the lock file.
+
 if ln "${tmp_doas}" "${doas_lock_file}"
 then
-    set_trap_rm "${tmp_doas}" "${doas_lock_file}"
+    set_trap_rm "${tmp_doas}" "${tmp_test_ln}" "${doas_lock_file}"
 else
-    die "The doas.conf file is already locked"
+    die "${DOAS_CONF} is already locked"
 fi
+
+# Some versions of vi(1) exit with a code that reflects the number of
+# editing errors made.  This is why we ignore the exit code from the
+# editor.
 
 "${EDITOR:-vi}" "${tmp_doas}" || true
 
@@ -90,18 +104,21 @@ do
     "${EDITOR:-vi}" "${tmp_doas}" || true
 done
 
+# Use mv(1) to rename the temporary file to doas.conf as it is atomic.
+# This avoids any problems from another process reading doas.conf while
+# it is being written.
+
 if [ -s "${tmp_doas}" ]
 then
-    if cmp -s "${tmp_doas}" "${installed_doas}"
+    if cmp -s "${tmp_doas}" "${DOAS_CONF}"
     then
 	warn "No changes made"
-	warn "${installed_doas} unchanged"
+	warn "${DOAS_CONF} unchanged"
     else
-	doas -- install -m "${doas_conf_mode}" \
-	    "${tmp_doas}" "${installed_doas}" \
-	&& warn "${installed_doas} updated"
+	mv "${tmp_doas}" "${DOAS_CONF}" \
+	&& warn "${DOAS_CONF} updated"
     fi
 else
     warn "Not installing an empty doas.conf file"
-    warn "${installed_doas} unchanged"
+    warn "${DOAS_CONF} unchanged"
 fi
