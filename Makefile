@@ -1,3 +1,4 @@
+CAT?=cat
 SED?=sed
 CC?=clang
 YACC?=yacc
@@ -87,10 +88,7 @@ clean:
 # Doing it this way allows to change the original files
 # only partially instead of renaming them.
 doas.1.final: doas.1
-	$(SED) 's,@DOAS_CONF@,$(DOAS_CONF),g' < $< > $@
-
 doas.conf.5.final: doas.conf.5
-	$(SED) 's,@DOAS_CONF@,$(DOAS_CONF),g' < $< > $@
-
 vidoas.final: vidoas
-	$(SED) 's,@DOAS_CONF@,$(DOAS_CONF),g' < $< > $@
+doas.1.final doas.conf.5.final vidoas.final:
+	$(CAT) $^ | $(SED) 's,@DOAS_CONF@,$(DOAS_CONF),g' > $@
