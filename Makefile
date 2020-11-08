@@ -63,7 +63,7 @@ y.tab.o: parse.y
 	$(YACC) parse.y
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c y.tab.c
 
-install: $(BIN) vidoas.final
+install: $(BIN) doas.1.final doas.conf.5.final vidoas.final
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	cp $(BIN) $(DESTDIR)$(PREFIX)/bin/
 	chmod 4755 $(DESTDIR)$(PREFIX)/bin/$(BIN)
