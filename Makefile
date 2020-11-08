@@ -1,15 +1,17 @@
-AWK?=awk
+CAT?=cat
+SED?=sed
 CC?=clang
 YACC?=yacc
 BIN=doas
 PREFIX?=/usr/local
 MANDIR?=$(DESTDIR)$(PREFIX)/man
 SYSCONFDIR?=$(DESTDIR)$(PREFIX)/etc
+DOAS_CONF=$(SYSCONFDIR)/doas.conf
 OBJECTS=doas.o env.o compat/execvpe.o compat/reallocarray.o y.tab.o 
 OPT?=-O2
 # Can set GLOBAL_PATH here to set PATH for target user.
 # TARGETPATH=-DGLOBAL_PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\"
-CFLAGS+=-Wall $(OPT) -DUSE_PAM -DDOAS_CONF=\"${SYSCONFDIR}/doas.conf\" $(TARGETPATH)
+CFLAGS+=-Wall $(OPT) -DUSE_PAM -DDOAS_CONF=\"$(DOAS_CONF)\" $(TARGETPATH)
 CPPFLAGS+=-include compat/compat.h
 LDFLAGS+=-lpam
 UNAME_S := $(shell uname -s)
@@ -45,7 +47,9 @@ ifeq ($(UNAME_S),Darwin)
     MANDIR=$(DESTDIR)$(PREFIX)/share/man
 endif
 
-all: $(OBJECTS) doas.1.final doas.conf.5.final
+all: $(BIN) doas.1.final doas.conf.5.final vidoas.final
+
+$(BIN): $(OBJECTS)
 	$(CC) -o $(BIN) $(OBJECTS) $(LDFLAGS)
 
 env.o: doas.h env.c
@@ -60,11 +64,12 @@ y.tab.o: parse.y
 	$(YACC) parse.y
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c y.tab.c
 
-install: $(BIN)
+install: $(BIN) doas.1.final doas.conf.5.final vidoas.final
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	cp $(BIN) $(DESTDIR)$(PREFIX)/bin/
-	cp vidoas $(DESTDIR)$(PREFIX)/bin/
 	chmod 4755 $(DESTDIR)$(PREFIX)/bin/$(BIN)
+	cp vidoas.final $(DESTDIR)$(PREFIX)/bin/vidoas
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/vidoas
 	mkdir -p $(MANDIR)/man1
 	cp doas.1.final $(MANDIR)/man1/doas.1
 	mkdir -p $(MANDIR)/man5
@@ -82,8 +87,8 @@ clean:
 
 # Doing it this way allows to change the original files
 # only partially instead of renaming them.
-doas.1.final:
-	$(AWK) -v pfx="$(SYSCONFDIR)" '{gsub("@SUBSTSYSCONFDIR@",pfx); print $$0}' < doas.1 > doas.1.final
-
-doas.conf.5.final:
-	$(AWK) -v pfx="$(SYSCONFDIR)" '{gsub("@SUBSTSYSCONFDIR@",pfx); print $$0}' < doas.conf.5 > doas.conf.5.final
+doas.1.final: doas.1
+doas.conf.5.final: doas.conf.5
+vidoas.final: vidoas
+doas.1.final doas.conf.5.final vidoas.final:
+	$(CAT) $^ | $(SED) 's,@DOAS_CONF@,$(DOAS_CONF),g' > $@
