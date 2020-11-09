@@ -102,11 +102,11 @@ EOF
 
 noop=0
 
-while getopts n opt
+while getopts hn opt
 do
     case "${opt}" in
-    n) noop=$((${noop} + 1));;
     h) usage; exit 0;;
+    n) noop=$((${noop} + 1));;
     *) usage 1>&2; exit 1;;
     esac
 done
