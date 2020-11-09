@@ -70,9 +70,8 @@ install: $(BIN) $(FINALS)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	cp $(BIN) $(DESTDIR)$(PREFIX)/bin/
 	chmod 4755 $(DESTDIR)$(PREFIX)/bin/$(BIN)
-	mkdir -p $(DESTDIR)$(PREFIX)/sbin
-	cp vidoas.final $(DESTDIR)$(PREFIX)/sbin/vidoas
-	chmod 755 $(DESTDIR)$(PREFIX)/sbin/vidoas
+	cp vidoas.final $(DESTDIR)$(PREFIX)/bin/vidoas
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/vidoas
 	mkdir -p $(MANDIR)/man1
 	cp doas.1.final $(MANDIR)/man1/doas.1
 	mkdir -p $(MANDIR)/man5
@@ -82,7 +81,7 @@ install: $(BIN) $(FINALS)
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/doas
-	rm -f $(DESTDIR)$(PREFIX)/sbin/vidoas
+	rm -f $(DESTDIR)$(PREFIX)/bin/vidoas
 	rm -f $(MANDIR)/man1/doas.1
 	rm -f $(MANDIR)/man5/doas.conf.5
 	rm -f $(MANDIR)/man8/vidoas.8

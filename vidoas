@@ -188,6 +188,10 @@ fi
 
 if ${noop}
 then
+    if ! doas -C "${DOAS_CONF}"
+    then
+        die "${DOAS_CONF} contains syntax errors."
+    fi
     warn 'OK: Prerequisite checks passed'
     exit 0
 fi
