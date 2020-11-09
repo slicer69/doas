@@ -1,0 +1,70 @@
+.\"
+.\" Copyright (c) 2020 Kimmo Suominen <kim@netbsd.org>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for
+.\" any purpose with or without fee is hereby granted, provided that
+.\" the above copyright notice and this permission notice appear in all
+.\" copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+.\" WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+.\" WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+.\" AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+.\" DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA
+.\" OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+.\" TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+.\" PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd November 9, 2020
+.Dt VIDOAS 1
+.Os
+.Sh NAME
+.Nm vidoas
+.Nd edit a doas configuration file
+.Sh SYNOPSIS
+.Nm
+.Op Fl n
+.Op Ar file
+.Nm
+.Fl h
+.Sh DESCRIPTION
+The
+.Nm
+utility opens an editor on a temporary copy of a
+.Xr doas 1
+configuration file and checks it for syntax errors before installing it
+as the actual configuration file.
+.Pp
+The options are as follows:
+.Bl -tag -width EDITOR
+.It Fl h
+Show a usage message.
+.It Fl n
+Do not edit the file, just perform prerequisite checks.
+If this switch is repeated, all output will be suppressed and the check
+result is only indicated by the exit status.
+.El
+.Sh EXIT STATUS
+.Ex -std
+.Sh ENVIRONMENT
+.Bl -tag -width EDITOR
+.It Ev EDITOR
+The editor command used for editing the configuration file.
+If the
+.Ev EDITOR
+environment variable is null or not set, the
+.Xr vi 1
+editor program will be used.
+.El
+.Sh FILES
+.Bl -tag -width EDITOR
+.It Pa @DOAS_CONF@
+The default configuration file to edit, when no
+.Ar file
+argument is specified.
+.El
+.Sh SEE ALSO
+.Xr doas 1 ,
+.Xr doas.conf 5
+.Sh AUTHORS
+.An Kimmo Suominen Aq Mt kim@netbsd.org
