@@ -14,5 +14,5 @@ permit keepenv bob as root
 
 # Permit user cindy to run only the pkg package manager as root
 # to perform package updates and upgrades.
-permit cindy as root cmd pkg update
-permit cindy as root cmd pkg upgrade
+permit cindy as root cmd pkg args update
+permit cindy as root cmd pkg args upgrade
