@@ -12,6 +12,8 @@ Installing doas is accomplished in three steps:
 2. Compiling and installing the doas utility.
 3. Creating a configuration file for doas.
 
+[https://aur.archlinux.org/packages/doas/](On Arch Linux, there is also a package available in the AUR.)
+
 ## Installing build tools
 
 1 - The doas program has virtually no dependencies. So long as you have a compiler (such as the GNU Compiler or Clang) installed and GNU make (gmake on NetBSD, FreeBSD, and illumos). On illumos, the build-essential package will install all the necessary build tools. 
