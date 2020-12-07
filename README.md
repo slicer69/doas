@@ -8,18 +8,24 @@ The doas program offers two benefits over sudo: its configuration file has a sim
 This port of doas has been made to work on FreeBSD 11.x and newer, most distributions of Linux, NetBSD 8.x and newer, and most illumos distributions (tested on OmniOS and SmartOS). It also works on macOS Catalina.
 
 Installing doas is accomplished in three steps:
+0. Optionally install the package/port for your operating system, OR
 1. Installing build tools.
 2. Compiling and installing the doas utility.
 3. Creating a configuration file for doas.
 
-## Installation via AUR
+## Installation via packages/repositories:
 
-[For Arch Linux users is a package available in the AUR:](https://aur.archlinux.org/packages/doas/)
+[For Arch Linux users (and Arch-based distributions) there is a package available in the AUR:](https://aur.archlinux.org/packages/doas/)
 ```
  ~ git clone https://aur.archlinux.org/doas.git
  ~ cd doas
  ~ makepkg -si
 ```
+
+The doas command is in FreeBSD's ports collection and may be installed by simply running the following command as the root user:
+
+      pkg install doas
+
 
 ## Installing build tools
 
@@ -80,9 +86,6 @@ Note: By default macOS blocks doas from using PAM modules, causing doas authenti
 
      PREFIX=/opt/local gmake install
 
-Note: The doas command is in FreeBSD's ports collection and may be installed by simply running the following command as the root user:
-
-      pkg install doas
 
 ## Creating a configuration file
 
