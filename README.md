@@ -12,7 +12,14 @@ Installing doas is accomplished in three steps:
 2. Compiling and installing the doas utility.
 3. Creating a configuration file for doas.
 
-[https://aur.archlinux.org/packages/doas/](For Arch Linux users is a package available in the AUR.) Install it using your AUR helper or using `makepkg -si`.
+## Installation via AUR
+
+[For Arch Linux users is a package available in the AUR:](https://aur.archlinux.org/packages/doas/)
+```
+ ~ git clone https://aur.archlinux.org/doas.git
+ ~ cd doas
+ ~ makepkg -si
+```
 
 ## Installing build tools
 
