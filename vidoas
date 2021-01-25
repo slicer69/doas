@@ -28,6 +28,7 @@ PROG="${0##*/}"
 umask 022
 
 DOAS_CONF=@DOAS_CONF@
+doas_conf_mode="0600"
 
 die()
 {
@@ -230,9 +231,9 @@ then
 	warn "No changes made"
 	warn "${DOAS_CONF} unchanged"
     else
-	doas -- install -o root -m "${doas_conf_mode}" \
-	    "${tmp_doas}" "${installed_doas}" \
-	&& warn "${installed_doas} updated"
+	install -o root -m "${doas_conf_mode}" \
+	    "${tmp_doas}" "${DOAS_CONF}" \
+	&& warn "${DOAS_CONF} updated"
     fi
 else
     warn "Not installing an empty doas.conf file"
