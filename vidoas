@@ -97,7 +97,7 @@ then
 	warn "No changes made"
 	warn "${installed_doas} unchanged"
     else
-	doas -- install -m "${doas_conf_mode}" \
+	doas -- install -o root -m "${doas_conf_mode}" \
 	    "${tmp_doas}" "${installed_doas}" \
 	&& warn "${installed_doas} updated"
     fi
