@@ -48,8 +48,8 @@ typedef struct {
 FILE *yyfp;
 
 struct rule **rules;
-int nrules;
-static int maxrules;
+size_t nrules = 0;
+static size_t maxrules = 0;
 
 int parse_errors = 0;
 
@@ -96,7 +96,7 @@ rule:		action ident target cmd {
 			r->cmdargs = $4.cmdargs;
 			if (nrules == maxrules) {
 				if (maxrules == 0)
-					maxrules = 63;
+					maxrules = 32;
 				else
 					maxrules *= 2;
 				if (!(rules = reallocarray(rules, maxrules,

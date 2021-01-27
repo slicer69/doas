@@ -26,7 +26,7 @@ struct rule {
 };
 
 extern struct rule **rules;
-extern int nrules;
+extern size_t nrules;
 extern int parse_errors;
 
 struct passwd;
