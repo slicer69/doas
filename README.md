@@ -82,6 +82,13 @@ Note to Linux users: Some Linux distributions, such as CentOS, will block doas f
 
 Note: By default macOS blocks doas from using PAM modules, causing doas authentication to fail. The cp command above copies the sudo PAM configuration into place for doas to use.
 
+Please also note that macOS systems have been reported to have their /usr and/or /usr/local
+directories set to be writable to regular user accounts when homebrew is installed. If this is the case, fix this before
+installing doas. Having these directories, like /usr/local/bin and /usr/local/etc, writable
+to your user means anyone can remove and replace your doas.conf file or the doas binary,
+allowing anyone or any program to run commands as root on your system or harvest your password.
+This is a large security hole and outside the scope of doas.
+
 
 #### illumos
 
@@ -101,7 +108,7 @@ Where <user> is the username of the person who is being granted root access. For
 Additional users can be added to the file, one per line.
 
 Please note that a shell script, vidoas, is included with the doas program. The vidoas
-script can be run as a regular user and will perform a syntax check on the doas.conf
+script must be run as the root user and will perform a syntax check on the doas.conf
 file before installing it on the system. This avoids breaking the doas.conf file. The
 vidoas script accepts no parameters and can be simply run as
 
