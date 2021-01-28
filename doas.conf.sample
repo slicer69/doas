@@ -16,3 +16,7 @@ permit keepenv bob as root
 # to perform package updates and upgrades.
 permit cindy as root cmd pkg args update
 permit cindy as root cmd pkg args upgrade
+
+# Allow david to run id command as root without logging it
+permit nolog david as root cmd id
+

@@ -71,7 +71,7 @@ arraylen(const char **arr)
 %}
 
 %token TPERMIT TDENY TAS TCMD TARGS
-%token TNOPASS TPERSIST TKEEPENV TSETENV
+%token TNOPASS TNOLOG TPERSIST TKEEPENV TSETENV
 %token TSTRING
 
 %%
@@ -136,6 +136,9 @@ options:	/* none */ {
 		} ;
 option:		TNOPASS {
 			$$.options = NOPASS;
+			$$.envlist = NULL;
+                } | TNOLOG {
+			$$.options = NOLOG;
 			$$.envlist = NULL;
 		} | TPERSIST {
 			$$.options = PERSIST;
@@ -210,6 +213,7 @@ static struct keyword {
 	{ "cmd", TCMD },
 	{ "args", TARGS },
 	{ "nopass", TNOPASS },
+        { "nolog", TNOLOG },
 	{ "persist", TPERSIST },
 	{ "keepenv", TKEEPENV },
 	{ "setenv", TSETENV },

@@ -557,8 +557,12 @@ main(int argc, char **argv)
 		err(1, "pledge");
         */
 
-	syslog(LOG_AUTHPRIV | LOG_INFO, "%s ran command %s as %s from %s",
-	    myname, cmdline, target_pw->pw_name, cwd);
+        /* skip logging if NOLOG is set */
+        if (!(rule->options & NOLOG))
+        {
+	    syslog(LOG_AUTHPRIV | LOG_INFO, "%s ran command %s as %s from %s",
+	            myname, cmdline, target_pw->pw_name, cwd);
+        }
 
 	envp = prepenv(rule, original_pw, target_pw);
 

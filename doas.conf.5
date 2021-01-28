@@ -47,6 +47,9 @@ Options are:
 .Bl -tag -width keepenv
 .It Ic nopass
 The user is not required to enter a password.
+.It Ic nolog
+Do not log successful command execution to
+.Xr syslogd.
 .It Ic persist
 After the user successfully authenticates, do not ask for a password
 again for some time. Works on OpenBSD only, persist is not available on Linux or FreeBSD.
