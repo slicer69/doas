@@ -151,6 +151,13 @@ before the second has been written, giving Susan access to everything,
 including the root account. The better approach to is explicity allow Susan
 to access only specific accounts she needs to use.
 
+Entries in the doas.conf file must end with a newline character to
+indicate where a rule ends. Most text editors will add a newline or
+end of line character for you, however not all tools do. Please make
+sure each rule in your doas.conf file ends with a newline (Enter)
+character. Otherwise syntax checks will fail with an error
+"syntax error at line..."
+
 .Sh EXAMPLES
 The following example permits users in group wsrc to build ports;
 wheel to execute commands as any user while keeping the environment
