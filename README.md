@@ -114,6 +114,15 @@ vidoas script accepts no parameters and can be simply run as
 
       vidoas
 
+## Desktop applications (GUI applications)
+
+Please be aware that, by default, doas scrubs most environment variables. In effect 
+this means certain information about your environment will not be passed to the target
+user and graphical desktop applications (GUI applications) will not be able to run.
+To enable graphical applications to run from doas, please use the keepenv keyword
+in the configuration file. See the doas.conf manual page for details.
+
+## Running commands using doas
 
 To make use of doas, run it in front of any command. Here are some examples:
 
