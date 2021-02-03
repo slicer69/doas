@@ -70,6 +70,17 @@ Note to Linux users: Some Linux distributions, such as CentOS, will block doas f
 
       cp /etc/pam.d/sudo /etc/pam.d/doas
 
+In situations where you do not have a /etc/pam.d/sudo file (perhaps due to sudo not being installed)
+then create a new file with your preferred text editor called /etc/pam.d/doas and insert the
+following lines:
+
+      #%PAM-1.0
+      @include common-auth
+      @include common-account
+      @include common-session-noninteractive
+
+After you safe this file you may need to reboot in order for the change to take effect.
+
 
 #### FreeBSD and NetBSD 
 
