@@ -79,7 +79,7 @@ following lines:
       @include common-account
       @include common-session-noninteractive
 
-After you safe this file you may need to reboot in order for the change to take effect.
+After you save this file you may need to reboot in order for the change to take effect.
 
 
 #### FreeBSD and NetBSD 
