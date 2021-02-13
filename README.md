@@ -35,6 +35,10 @@ The doas command is in FreeBSD's ports collection and may be installed by simply
 #### Debian and Ubuntu based distributions
 
      sudo apt install build-essential make bison flex libpam0g-dev 
+
+#### Fedora
+
+     sudo dnf install gcc gcc-c++ kernel-devel make flex bison bison-devel flex-devel pam-devel byacc
     
 #### macOS
 
