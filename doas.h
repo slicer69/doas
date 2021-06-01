@@ -65,3 +65,6 @@ struct passwd *copyenvpw(struct passwd *original);
 #define SAFE_PATH "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 #endif
 
+#ifndef MAX_ENV_LENGTH
+#define MAX_ENV_LENGTH 1024
+#endif
