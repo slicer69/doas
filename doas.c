@@ -520,7 +520,8 @@ main(int argc, char **argv)
 
         
 #if defined(HAVE_LOGIN_CAP_H)
-	if (setusercontext(NULL, target_pw, target, LOGIN_SETLOGINCLASS | LOGIN_SETGROUP |
+	if (setusercontext(NULL, target_pw, target, LOGIN_SETENV | 
+            LOGIN_SETGROUP | LOGIN_SETLOGINCLASS |
 	    LOGIN_SETPRIORITY | LOGIN_SETRESOURCES | LOGIN_SETUMASK |
 	    LOGIN_SETUSER) != 0)
 		errx(1, "failed to set user context for target");
