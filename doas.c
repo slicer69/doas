@@ -520,11 +520,24 @@ main(int argc, char **argv)
 
         
 #if defined(HAVE_LOGIN_CAP_H)
-	if (setusercontext(NULL, target_pw, target, LOGIN_SETENV | 
-            LOGIN_SETGROUP | LOGIN_SETLOGINCLASS |
-	    LOGIN_SETPRIORITY | LOGIN_SETRESOURCES | LOGIN_SETUMASK |
-	    LOGIN_SETUSER) != 0)
-		errx(1, "failed to set user context for target");
+        /* When simulating full login we want the target environment */
+        if (Sflag)
+        {
+	    if (setusercontext(NULL, target_pw, target, LOGIN_SETENV | 
+                LOGIN_SETGROUP | LOGIN_SETLOGINCLASS |
+                LOGIN_SETPRIORITY | LOGIN_SETRESOURCES | LOGIN_SETUMASK |
+	        LOGIN_SETUSER) != 0)
+		     errx(1, "failed to set user context for target");
+        }
+        /* No imulated login, skip setting target environment */
+        else
+        {
+           if (setusercontext(NULL, target_pw, target, 
+                LOGIN_SETGROUP | LOGIN_SETLOGINCLASS |
+                LOGIN_SETPRIORITY | LOGIN_SETRESOURCES | LOGIN_SETUMASK |
+                LOGIN_SETUSER) != 0)
+                     errx(1, "failed to set user context for target");
+        }
 #else
 	#if defined(__linux__) || defined(__FreeBSD__)
 	if (setresgid(target_pw->pw_gid, target_pw->pw_gid, target_pw->pw_gid) == -1)
