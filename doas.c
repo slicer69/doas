@@ -529,7 +529,7 @@ main(int argc, char **argv)
 	        LOGIN_SETUSER) != 0)
 		     errx(1, "failed to set user context for target");
         }
-        /* No imulated login, skip setting target environment */
+        /* No simulated login, skip setting target environment */
         else
         {
            if (setusercontext(NULL, target_pw, target, 

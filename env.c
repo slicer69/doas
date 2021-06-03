@@ -117,7 +117,6 @@ createenv(struct rule *rule, struct passwd *original, struct passwd *target)
 {
 	struct env *env;
 	u_int i;
-        char *language = NULL;
 
 	env = malloc(sizeof(*env));
 	if (!env)
@@ -134,10 +133,6 @@ createenv(struct rule *rule, struct passwd *original, struct passwd *target)
 	addnode(env, "PATH", GLOBAL_PATH); 
 	addnode(env, "SHELL", target->pw_shell);
 	addnode(env, "USER", target->pw_name);
-        /* avoid dropping language of original user */
-        language = getenv("LANG");
-        if (language)
-           addnode(env, "LANG", language);
 
 	if (rule->options & KEEPENV) {
                 #ifndef linux
@@ -200,7 +195,7 @@ fillenv(struct env *env, const char **envlist)
 	struct envnode *node, key;
 	const char *e, *eq;
 	const char *val;
-	char name[1024];
+	char name[MAX_ENV_LENGTH];
 	u_int i;
 	size_t len;
 
