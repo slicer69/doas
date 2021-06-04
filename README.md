@@ -36,7 +36,6 @@ The doas command is in FreeBSD's ports collection and may be installed by simply
 
      sudo apt install build-essential make bison flex libpam0g-dev 
 
-
 #### Fedora
 
       sudo dnf install gcc gcc-c++ make flex bison pam-devel byacc
@@ -48,6 +47,10 @@ The doas command is in FreeBSD's ports collection and may be installed by simply
 #### CentOS 7.x
 
       sudo yum install gcc gcc-c++ make flex bison pam-devel byacc git
+
+#### openSUSE and SUSE Linux Enterprise
+
+      sudo zypper install gcc gcc-c++ make flex bison pam-devel byacc git
 
 #### macOS
 
