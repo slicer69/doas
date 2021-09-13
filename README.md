@@ -1,5 +1,5 @@
 # doas
-A port of OpenBSD's doas which runs on FreeBSD, Linux, NetBSD, illumos and macOS.
+A port of OpenBSD's doas which runs on FreeBSD, Linux, NetBSD, illumos, macOS and MidnightBSD.
 
 The doas utility is a program originally written for OpenBSD which allows a user to run a command as though they were another user. Typically doas is used to allow non-privileged users to run commands as though they were the root user. The doas program acts as an alternative to sudo, which is a popular method in the Linux community for granting admin access to specific users.
 
@@ -27,6 +27,9 @@ The doas command is in FreeBSD's ports collection and may be installed by simply
 
       pkg install doas
 
+The doas command may be installed from MidnightBSD's mports collection with: 
+
+      mport install doas
 
 ## Installing build tools
 
@@ -64,7 +67,7 @@ The doas command is in FreeBSD's ports collection and may be installed by simply
 
      make
     
-#### FreeBSD, NetBSD and macOS
+#### FreeBSD, MidnightBSD, NetBSD and macOS
 
      gmake
 
@@ -98,7 +101,7 @@ following lines:
 After you save this file you may need to reboot in order for the change to take effect.
 
 
-#### FreeBSD and NetBSD 
+#### FreeBSD, MidnightBSD and NetBSD 
 
      gmake install
 
