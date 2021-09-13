@@ -161,6 +161,11 @@ Create a new file in the root user's home:
 
      doas touch /root/new-file
 
+Edit a text file which requires admin access without running the text editor
+as the root user:
+
+     doasedit /path/to/text/file
+
 On Linux versions of doas prior to 6.3p1 required commands with arguments to be prefixed by a double-dash (--). From 6.3p1 and onward the double-dash is no longer required. Here we remove a directory owned by root:
 
      doas -- rm -rf old-directory

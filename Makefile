@@ -47,7 +47,7 @@ ifeq ($(UNAME_S),Darwin)
     MANDIR=$(DESTDIR)$(PREFIX)/share/man
 endif
 
-FINALS=doas.1.final doas.conf.5.final vidoas.final vidoas.8.final
+FINALS=doas.1.final doas.conf.5.final vidoas.final vidoas.8.final 
 
 all: $(BIN) $(FINALS)
 
@@ -72,19 +72,24 @@ install: $(BIN) $(FINALS)
 	chmod 4755 $(DESTDIR)$(PREFIX)/bin/$(BIN)
 	cp vidoas.final $(DESTDIR)$(PREFIX)/bin/vidoas
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/vidoas
+	cp doasedit $(DESTDIR)$(PREFIX)/bin/doasedit
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/doasedit
 	mkdir -p $(MANDIR)/man1
 	cp doas.1.final $(MANDIR)/man1/doas.1
 	mkdir -p $(MANDIR)/man5
 	cp doas.conf.5.final $(MANDIR)/man5/doas.conf.5
 	mkdir -p $(MANDIR)/man8
 	cp vidoas.8.final $(MANDIR)/man8/vidoas.8
+	cp doasedit.8 $(MANDIR)/man8/doasedit.8
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/doas
 	rm -f $(DESTDIR)$(PREFIX)/bin/vidoas
+	rm -f $(DESTDIR)$(PREFIX)/bin/doasedit
 	rm -f $(MANDIR)/man1/doas.1
 	rm -f $(MANDIR)/man5/doas.conf.5
 	rm -f $(MANDIR)/man8/vidoas.8
+	rm -f $(MANDIR)/man8/doasedit.8
 
 clean:
 	rm -f $(BIN) $(OBJECTS) y.tab.c
