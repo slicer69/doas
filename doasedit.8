@@ -36,7 +36,8 @@ to run their text editor as the super user.
 .Pp
 The doasedit utility accepts one argument, the file to
 be edited. The text editor used during the editing process
-is set using the EDITOR environment variable.
+is set using the VISUAL environment variable. If VISUAL fails
+to run, EDITOR is tried instead.
 .El
 .Sh EXIT STATUS
 .Ex -std

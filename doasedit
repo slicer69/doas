@@ -44,13 +44,21 @@ then
    exit 5
 fi
 
-"${EDITOR:-vi}" "$temp_file"
+# If $VISUAL fails, run $EDITOR.
+# $EDITOR should be a line editor functional without advanced terminal features.
+# $VISUAL is a more advanced editor such as vi.
+"${VISUAL:-vi}" "$temp_file"
 if [ ! $? ]
 then
-  echo "Could not run editor $EDITOR"
-  echo "Please make sure EDITOR variable is set."
-  rm -f "$temp_file"
-  exit 6
+    "${EDITOR:-ex}" "$temp_file"
+    if [ ! $? ]
+    then
+      echo "Could not run visual editor $VISUAL"
+      echo "Could not run editor $EDITOR"
+      echo "Please make sure the VISUAL and/or EDITOR variables are set."
+      rm -f "$temp_file"
+      exit 6
+    fi
 fi
 
 # Check to see if the file has been changed.
