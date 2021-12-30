@@ -30,7 +30,11 @@ The doas command is in FreeBSD's ports collection and may be installed by simply
 The doas command may be installed from MidnightBSD's mports collection with: 
 
       mport install doas
+      
+The doas command may be installed from [Pacstall](https://github.com/pacstall/pacstall) (Debian/Ubuntu) with: 
 
+      pacstall -I doas-git
+      
 ## Installing build tools
 
 1 - The doas program has virtually no dependencies. So long as you have a compiler (such as the GNU Compiler or Clang) installed and GNU make (gmake on NetBSD, FreeBSD, and illumos). On illumos, the build-essential package will install all the necessary build tools. 
