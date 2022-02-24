@@ -165,6 +165,19 @@ On Linux versions of doas prior to 6.3p1 required commands with arguments to be 
 
      doas -- rm -rf old-directory
 
+## Removing doas
+
+To remove the doas program and its helper programs, you can pass the Makefile the
+"uninstall" parameter. On most Linux distributions you can run the following from the
+doas source directory:
+
+     make uninstall
+
+while on most other platforms, such as FreeBSD, you can run
+
+     gmake uninstall
+
+
 ## Contributing
 
 Contributions, in various forms, are always welcome. If you run into a problem or have an improvement you'd like to see included, pelase use GitHub's tools to submit an issue ticket or a pull request. Should you encounter a bug  you feel is a security concern, please contact the developer privately at jessefrgsmith AT yahoo DOT ca.
