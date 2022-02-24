@@ -76,7 +76,9 @@ would prompt for password.
 .It Fl S
 Same as
 .Fl s
-but simulates a full login.
+but simulates a full login. Please note this may result in doas applying resource limits
+to the user based on the target user's login class. However, environment variables
+applicable to the target user are still stripped, unless KEEPENV is specified.
 .It Fl s
 Execute the shell from
 .Ev SHELL

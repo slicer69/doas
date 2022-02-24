@@ -102,7 +102,7 @@ copyenvpw(struct passwd *my_static)
     new_pw->pw_passwd = strdup(my_static->pw_passwd);
     new_pw->pw_uid = my_static->pw_uid;
     new_pw->pw_gid = my_static->pw_gid;
-    #if defined(__FreeBSD__)
+    #if defined(__FreeBSD__) || defined(__MidnightBSD__)
     new_pw->pw_class = strdup(my_static->pw_class);
     #endif
     new_pw->pw_gecos = strdup(my_static->pw_gecos);

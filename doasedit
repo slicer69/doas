@@ -1,0 +1,94 @@
+#!/bin/sh
+# Copy an existing text file to a temporary location. Then
+# Edit the file.
+# Attempt to then transfer the temporary file back to the original
+# location if the temprary file has been altered.
+# Conclude with a little clean-up.
+# Try to avoid deleting any changes.
+
+if [ $# -lt 1 ]
+then
+   echo "usage: $0 text-file"
+   exit 1
+fi
+
+if [ ! -f "$1" ]
+then
+   echo "File does not exist or is a special file/link."
+   exit 2
+fi
+
+if [ -L "$1" ]
+then
+   echo "File is a symbolic link. Refusing to edit."
+   exit 2
+fi
+
+if [ ! -r "$1" ]
+then
+   echo "This user is unable to read the specified file."
+   exit 3
+fi
+
+temp_file=$(mktemp --tmpdir doasedit.XXXXXXXX)
+if [ ! $? ]
+then
+   echo "Could not create temporary file."
+   exit 4
+fi
+
+cp "$1" "$temp_file"
+if [ ! $? ]
+then
+   echo "Unable to copy file $1"
+   exit 5
+fi
+
+# If $VISUAL fails, run $EDITOR.
+# $EDITOR should be a line editor functional without advanced terminal features.
+# $VISUAL is a more advanced editor such as vi.
+"${VISUAL:-vi}" "$temp_file"
+if [ ! $? ]
+then
+    "${EDITOR:-ex}" "$temp_file"
+    if [ ! $? ]
+    then
+      echo "Could not run visual editor $VISUAL"
+      echo "Could not run editor $EDITOR"
+      echo "Please make sure the VISUAL and/or EDITOR variables are set."
+      rm -f "$temp_file"
+      exit 6
+    fi
+fi
+
+# Check to see if the file has been changed.
+cmp -s "$1" "$temp_file"
+status=$?
+if [ $status -eq 0 ]
+then
+   echo "File unchanged. Not writing back to original location."
+   rm -f "$temp_file"
+   exit 0
+fi
+
+# At this point the file has been changed. Make sure it still exists.
+if [ -f "$temp_file" ]
+then
+    doas cp "$temp_file" "$1"
+    cmp -s "$temp_file" "$1"
+    status=$?
+    # If file fails to copy, do not do clean-up
+    while [ $status -ne 0 ]
+    do
+       echo "Copying file back to $1 failed. Press Ctrl-C to abort or Enter to try again."
+       read abc
+       doas cp "$temp_file" "$1"
+       cmp -s "$temp_file" "$1"
+       status=$?
+    done
+fi
+
+# Clean up
+rm -f "$temp_file"
+exit 0
+

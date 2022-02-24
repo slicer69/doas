@@ -1,5 +1,5 @@
 # doas
-A port of OpenBSD's doas which runs on FreeBSD, Linux, NetBSD, illumos and macOS.
+A port of OpenBSD's doas which runs on FreeBSD, Linux, NetBSD, illumos, macOS and MidnightBSD.
 
 The doas utility is a program originally written for OpenBSD which allows a user to run a command as though they were another user. Typically doas is used to allow non-privileged users to run commands as though they were the root user. The doas program acts as an alternative to sudo, which is a popular method in the Linux community for granting admin access to specific users.
 
@@ -27,7 +27,14 @@ The doas command is in FreeBSD's ports collection and may be installed by simply
 
       pkg install doas
 
+The doas command may be installed from MidnightBSD's mports collection with: 
 
+      mport install doas
+      
+The doas command may be installed from [Pacstall](https://github.com/pacstall/pacstall) (Debian/Ubuntu) with: 
+
+      pacstall -I doas-git
+      
 ## Installing build tools
 
 1 - The doas program has virtually no dependencies. So long as you have a compiler (such as the GNU Compiler or Clang) installed and GNU make (gmake on NetBSD, FreeBSD, and illumos). On illumos, the build-essential package will install all the necessary build tools. 
@@ -64,7 +71,7 @@ The doas command is in FreeBSD's ports collection and may be installed by simply
 
      make
     
-#### FreeBSD, NetBSD and macOS
+#### FreeBSD, MidnightBSD, NetBSD and macOS
 
      gmake
 
@@ -98,7 +105,7 @@ following lines:
 After you save this file you may need to reboot in order for the change to take effect.
 
 
-#### FreeBSD and NetBSD 
+#### FreeBSD, MidnightBSD and NetBSD 
 
      gmake install
 
@@ -161,6 +168,11 @@ Create a new file in the root user's home:
 
      doas touch /root/new-file
 
+Edit a text file which requires admin access without running the text editor
+as the root user:
+
+     doasedit /path/to/text/file
+
 On Linux versions of doas prior to 6.3p1 required commands with arguments to be prefixed by a double-dash (--). From 6.3p1 and onward the double-dash is no longer required. Here we remove a directory owned by root:
 
      doas -- rm -rf old-directory
@@ -180,6 +192,6 @@ while on most other platforms, such as FreeBSD, you can run
 
 ## Contributing
 
-Contributions, in various forms, are always welcome. If you run into a problem or have an improvement you'd like to see included, pelase use GitHub's tools to submit an issue ticket or a pull request. Should you encounter a bug  you feel is a security concern, please contact the developer privately at jessefrgsmith AT yahoo DOT ca.
+Contributions, in various forms, are always welcome. If you run into a problem or have an improvement you'd like to see included, please use GitHub's tools to submit an issue ticket or a pull request. Should you encounter a bug  you feel is a security concern, please contact the developer privately at jessefrgsmith AT yahoo DOT ca.
 
 Financial donations are always welcome and can be submitted via PayPal to jessefrgsmith AT yahoo DOT ca or through Patreon at https://www.patreon.com/sysvinit . Thank you for your support.
