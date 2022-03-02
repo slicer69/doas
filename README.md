@@ -34,6 +34,9 @@ The doas command may be installed from MidnightBSD's mports collection with:
 The doas command may be installed from [Pacstall](https://github.com/pacstall/pacstall) (Debian/Ubuntu) with: 
 
       pacstall -I doas-git
+The doas command may be installed from apt (Debian/Ubuntu) with:
+      
+      sudo apt install doas
       
 ## Installing build tools
 
