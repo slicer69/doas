@@ -135,7 +135,7 @@ This is a large security hole and outside the scope of doas.
 
       permit <user> as root
 
-Where <user> is the username of the person who is being granted root access. For instance:
+Where "user" is the username of the person who is being granted root access. For instance:
 
       permit jesse as root
 
