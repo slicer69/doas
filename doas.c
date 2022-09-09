@@ -34,6 +34,7 @@
 #include <syslog.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <paths.h>
 
 #if defined(HAVE_LOGIN_CAP_H)
 #include <login_cap.h>
@@ -278,7 +279,7 @@ main(int argc, char **argv)
 	char *sh;
 	const char *cmd;
 	char cmdline[LINE_MAX];
-	char myname[_PW_NAME_LEN + 1];
+	char myname[_PW_NAME_LEN + 1], targetname[_PW_NAME_LEN + 1];
 	struct passwd *original_pw, *target_pw, *temp_pw; 
 	struct rule *rule;
 	uid_t uid;
@@ -319,7 +320,9 @@ main(int argc, char **argv)
 			exit(i != -1);
 */
 		case 'u':
-			if (parseuid(optarg, &target) != 0)
+			if (strlcpy(targetname, optarg, sizeof(targetname)) >= sizeof(targetname))
+				errx(1, "pw_name too long");
+			if (parseuid(targetname, &target) != 0)
 				errx(1, "unknown user");
 			break;
 		case 'n':
@@ -513,7 +516,12 @@ main(int argc, char **argv)
 	if (pledge("stdio rpath getpw exec id", NULL) == -1)
 		err(1, "pledge");
         */
-	temp_pw = getpwuid(target);
+	if (targetname[0] == '\0')
+		temp_pw = getpwuid(target);
+	else
+		temp_pw = getpwnam(targetname);
+	if (temp_pw->pw_shell[0] == '\0')
+		temp_pw->pw_shell = strdup(_PATH_BSHELL);
         target_pw = copyenvpw(temp_pw);
 	if (! target_pw)
 		errx(1, "no passwd entry for target");
