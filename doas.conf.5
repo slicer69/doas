@@ -91,6 +91,18 @@ Numeric IDs are also accepted.
 .It Ic as Ar target
 The target user the running user is allowed to run the command as.
 The default is all users.
+Please be aware that on some systems multiple usernames can resolve to
+the same UID. For example, on FreeBSD it is common to have both toor and root
+resolve to UID 0. The doas utility will allow any username that matches a shared
+UID to match when the -u flag is invoked. This means if you have the rule 
+.Bd -literal -offset indent
+permit alice as toor 
+
+.Ed
+in your doas.conf file, the command "doas -u root" can be successfully run from
+Alice's account in situations where both root and toor share the same UID. In short,
+doas cares about the UID behind the username, not the specific username given on the
+command line.
 .It Ic cmd Ar command
 The command the user is allowed or denied to run.
 The default is all commands.

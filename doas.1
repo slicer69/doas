@@ -88,6 +88,9 @@ or
 Execute the command as
 .Ar user .
 The default is root.
+Please note: On some systems multiple usernames can resolve to one UID. For example, root and
+toor both resolve to UID 0 on FreeBSD. Please see the "as" syntax section of the doas.conf manual page for details on
+how doas handles this situation.
 .It Fl -
 Any dashes after a combined double dash (--) will be interpreted as part of the command to be run or its parameters. Not an argument passed to doas itself.
 .El
