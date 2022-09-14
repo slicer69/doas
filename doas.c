@@ -302,6 +302,7 @@ main(int argc, char **argv)
 	closefrom(STDERR_FILENO + 1);
 
 	uid = getuid();
+	targetname[0] = '\0';
 
 	while ((ch = getopt(argc, argv, "+a:C:nSsu:")) != -1) {
 		switch (ch) {
@@ -320,7 +321,6 @@ main(int argc, char **argv)
 			exit(i != -1);
 */
 		case 'u':
-                        targetname[0] = '\0';
 			if (strlcpy(targetname, optarg, sizeof(targetname)) >= sizeof(targetname))
 				errx(1, "pw_name too long");
 			if (parseuid(targetname, &target) != 0)
