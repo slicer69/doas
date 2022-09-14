@@ -320,7 +320,10 @@ main(int argc, char **argv)
 			exit(i != -1);
 */
 		case 'u':
+<<<<<<< HEAD
                         targetname[0] = '\0';
+=======
+>>>>>>> 37c6de1e604db77b2afdc4cbb6a77e450d59c6a2
 			if (strlcpy(targetname, optarg, sizeof(targetname)) >= sizeof(targetname))
 				errx(1, "pw_name too long");
 			if (parseuid(targetname, &target) != 0)
