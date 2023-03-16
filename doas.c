@@ -420,7 +420,7 @@ main(int argc, char **argv)
 		pam_handle_t *pamh = NULL;
 		int pam_err;
 
-/* #ifndef linux */
+/* #ifndef __linux__ */
 		int temp_stdin;
 
 		/* openpam_ttyconv checks if stdin is a terminal and
@@ -497,7 +497,7 @@ main(int argc, char **argv)
 		}
 		pam_end(pamh, pam_err);
 
-#ifndef linux
+#ifndef __linux__
 		/* Re-establish stdin */
 		if (dup2(temp_stdin, STDIN_FILENO) == -1)
 			err(1, "dup2");
