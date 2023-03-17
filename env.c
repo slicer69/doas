@@ -135,7 +135,7 @@ createenv(struct rule *rule, struct passwd *original, struct passwd *target)
 	addnode(env, "USER", target->pw_name);
 
 	if (rule->options & KEEPENV) {
-                #ifndef linux
+                #ifndef __linux__
 		extern const char **environ;
                 #endif
 
