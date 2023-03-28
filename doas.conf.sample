@@ -5,7 +5,10 @@
 # Permit members of the wheel group to perform actions as root.
 permit :wheel
 
-# Permit user alice to run commands a root user.
+# Same without having to enter the password
+permit nopass :wheel
+
+# Permit user alice to run commands as a root user.
 permit alice as root
 
 # Permit user bob to run programs as root, maintaining
