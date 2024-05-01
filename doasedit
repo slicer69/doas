@@ -14,7 +14,7 @@ fi
 
 if [ ! -f "$1" ]
 then
-   echo "File does not exist or is a special file/link."
+   echo "File $1 does not exist or is a special file/link."
    exit 2
 fi
 
@@ -37,7 +37,8 @@ then
    exit 4
 fi
 
-cp "$1" "$temp_file"
+mydir=$(dirname -- "$1")
+cp "$mydir/$1" "$temp_file"
 if [ ! $? ]
 then
    echo "Unable to copy file $1"
@@ -62,7 +63,7 @@ then
 fi
 
 # Check to see if the file has been changed.
-cmp -s "$1" "$temp_file"
+cmp -s "$mydir/$1" "$temp_file"
 status=$?
 if [ $status -eq 0 ]
 then
@@ -74,16 +75,16 @@ fi
 # At this point the file has been changed. Make sure it still exists.
 if [ -f "$temp_file" ]
 then
-    doas cp "$temp_file" "$1"
-    cmp -s "$temp_file" "$1"
+    doas cp "$temp_file" "$mydir/$1"
+    cmp -s "$temp_file" "$mydir/$1"
     status=$?
     # If file fails to copy, do not do clean-up
     while [ $status -ne 0 ]
     do
        echo "Copying file back to $1 failed. Press Ctrl-C to abort or Enter to try again."
        read abc
-       doas cp "$temp_file" "$1"
-       cmp -s "$temp_file" "$1"
+       doas cp "$temp_file" "$mydir/$1"
+       cmp -s "$temp_file" "$mydir/$1"
        status=$?
     done
 fi
