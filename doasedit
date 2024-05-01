@@ -37,6 +37,12 @@ then
    exit 4
 fi
 
+if [ ! -r "$temp_file" ]
+then
+   echo "Was unable to create temporary file."
+   exit 4
+fi
+
 mydir=$(dirname -- "$1")
 cp "$mydir/$1" "$temp_file"
 if [ ! $? ]
