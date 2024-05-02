@@ -31,12 +31,6 @@ then
 fi
 
 temp_file=$(mktemp --tmpdir doasedit.XXXXXXXX)
-if [ ! $? ]
-then
-   echo "Could not create temporary file."
-   exit 4
-fi
-
 if [ ! -r "$temp_file" ]
 then
    echo "Was unable to create temporary file."
@@ -45,7 +39,8 @@ fi
 
 mydir=$(dirname -- "$1")
 cp "$mydir/$1" "$temp_file"
-if [ ! $? ]
+status=$?
+if [ $status -ne 0 ]
 then
    echo "Unable to copy file $1"
    exit 5
@@ -55,12 +50,14 @@ fi
 # $EDITOR should be a line editor functional without advanced terminal features.
 # $VISUAL is a more advanced editor such as vi.
 "${VISUAL:-vi}" "$temp_file"
-if [ ! $? ]
+status=$?
+if [ $status -ne 0 ]
 then
+    echo "Could not run visual editor $VISUAL"
     "${EDITOR:-ex}" "$temp_file"
-    if [ ! $? ]
+    status=$?
+    if [ $status -ne 0 ]
     then
-      echo "Could not run visual editor $VISUAL"
       echo "Could not run editor $EDITOR"
       echo "Please make sure the VISUAL and/or EDITOR variables are set."
       rm -f "$temp_file"
