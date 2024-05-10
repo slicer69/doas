@@ -110,6 +110,11 @@ The password was incorrect.
 .It
 The specified command was not found or is not executable.
 .El
+.Sh BUGS
+On Linux it is not possible to pipe output from other commands into commands run by doas.
+For example, "echo hello | doas tee abc" would not work on Linux.
+On other platforms, such as FreeBSD, output from another command can be piped to programs
+run by doas.
 .Sh SEE ALSO
 .Xr su 1 ,
 .Xr doas.conf 5

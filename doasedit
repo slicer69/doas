@@ -38,7 +38,8 @@ then
 fi
 
 mydir=$(dirname -- "$1")
-cp "$mydir/$1" "$temp_file"
+myfile=$(basename -- "$1")
+cp "$mydir/$myfile" "$temp_file"
 status=$?
 if [ $status -ne 0 ]
 then
@@ -66,7 +67,7 @@ then
 fi
 
 # Check to see if the file has been changed.
-cmp -s "$mydir/$1" "$temp_file"
+cmp -s "$mydir/$myfile" "$temp_file"
 status=$?
 if [ $status -eq 0 ]
 then
@@ -78,16 +79,16 @@ fi
 # At this point the file has been changed. Make sure it still exists.
 if [ -f "$temp_file" ]
 then
-    doas cp "$temp_file" "$mydir/$1"
-    cmp -s "$temp_file" "$mydir/$1"
+    doas cp "$temp_file" "$mydir/$myfile"
+    cmp -s "$temp_file" "$mydir/$myfile"
     status=$?
     # If file fails to copy, do not do clean-up
     while [ $status -ne 0 ]
     do
        echo "Copying file back to $1 failed. Press Ctrl-C to abort or Enter to try again."
        read abc
-       doas cp "$temp_file" "$mydir/$1"
-       cmp -s "$temp_file" "$mydir/$1"
+       doas cp "$temp_file" "$mydir/$myfile"
+       cmp -s "$temp_file" "$mydir/$myfile"
        status=$?
     done
 fi
