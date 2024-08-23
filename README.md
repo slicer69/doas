@@ -111,6 +111,7 @@ After you save this file you may need to reboot in order for the change to take 
 
 #### macOS
 
+     xcode-select --switch /Applications/Xcode.app/Contents/Developer
      gmake install
      cp /etc/pam.d/sudo /etc/pam.d/doas
 
