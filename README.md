@@ -71,9 +71,21 @@ The doas command may be installed from [Pacstall](https://github.com/pacstall/pa
 
      make
     
-#### FreeBSD, MidnightBSD, NetBSD and macOS
+#### FreeBSD, MidnightBSD, NetBSD
 
      gmake
+
+#### macOS
+
+To build `doas`, you'll also have to install and symlink `byacc`:
+
+    brew install byacc    
+    ln -s /opt/homebrew/bin/byacc /opt/homebrew/bin/yacc
+    export PATH="/opt/homebrew/bin/yacc:$PATH"
+
+Then you can simply run `make` or `gmake`:
+
+     make
 
 #### illumos
 
