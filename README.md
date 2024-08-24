@@ -111,21 +111,19 @@ After you save this file you may need to reboot in order for the change to take 
 
 #### macOS
 
-To build `doas`, you'll need to have Xcode Command Line Tools, as well as
-install and symlink `byacc`:
+To build `doas`, you'll need to have Xcode Command Line Tools, and use `bison`
+instead of `byacc`:
 
-    brew install byacc
-    ln -s /opt/homebrew/bin/byacc /opt/homebrew/bin/yacc
-    export PATH="/opt/homebrew/bin/yacc:$PATH"
+    YACC='bison -y' PREFIX=/opt/local make
 
 Alternatively, if you have Xcode.app installed, you can just:
 
     xcode-select --switch /Applications/Xcode.app/Contents/Developer
-    gmake install
+    make
 
-Then you can simply run `make` or `gmake`:
+Lastly, run the following:
 
-     make
+     make install
      cp /etc/pam.d/sudo /etc/pam.d/doas
 
 Note: By default macOS blocks doas from using PAM modules, causing doas authentication to fail. The cp command above copies the sudo PAM configuration into place for doas to use.
