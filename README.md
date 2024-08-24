@@ -75,18 +75,6 @@ The doas command may be installed from [Pacstall](https://github.com/pacstall/pa
 
      gmake
 
-#### macOS
-
-To build `doas`, you'll also have to install and symlink `byacc`:
-
-    brew install byacc    
-    ln -s /opt/homebrew/bin/byacc /opt/homebrew/bin/yacc
-    export PATH="/opt/homebrew/bin/yacc:$PATH"
-
-Then you can simply run `make` or `gmake`:
-
-     make
-
 #### illumos
 
      PREFIX=/opt/local gmake
@@ -123,8 +111,21 @@ After you save this file you may need to reboot in order for the change to take 
 
 #### macOS
 
-     xcode-select --switch /Applications/Xcode.app/Contents/Developer
-     gmake install
+To build `doas`, you'll need to have Xcode Command Line Tools, as well as
+install and symlink `byacc`:
+
+    brew install byacc
+    ln -s /opt/homebrew/bin/byacc /opt/homebrew/bin/yacc
+    export PATH="/opt/homebrew/bin/yacc:$PATH"
+
+Alternatively, if you have Xcode.app installed, you can just:
+
+    xcode-select --switch /Applications/Xcode.app/Contents/Developer
+    gmake install
+
+Then you can simply run `make` or `gmake`:
+
+     make
      cp /etc/pam.d/sudo /etc/pam.d/doas
 
 Note: By default macOS blocks doas from using PAM modules, causing doas authentication to fail. The cp command above copies the sudo PAM configuration into place for doas to use.
