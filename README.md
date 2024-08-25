@@ -5,7 +5,7 @@ The doas utility is a program originally written for OpenBSD which allows a user
 
 The doas program offers two benefits over sudo: its configuration file has a simple syntax and it is smaller, requiring less effort to audit the code. This makes it harder for both admins and coders to make mistakes that potentially open security holes in the system.
 
-This port of doas has been made to work on FreeBSD 11.x and newer, most distributions of Linux, NetBSD 8.x and newer, and most illumos distributions (tested on OmniOS and SmartOS). It also works on macOS Catalina.
+This port of doas has been made to work on FreeBSD 11.x and newer, most distributions of Linux, NetBSD 8.x and newer, and most illumos distributions (tested on OmniOS and SmartOS). It also works on macOS Sonoma.
 
 Installing doas is accomplished in three steps:
 
@@ -71,7 +71,7 @@ The doas command may be installed from [Pacstall](https://github.com/pacstall/pa
 
      make
     
-#### FreeBSD, MidnightBSD, NetBSD and macOS
+#### FreeBSD, MidnightBSD, NetBSD
 
      gmake
 
@@ -111,8 +111,19 @@ After you save this file you may need to reboot in order for the change to take 
 
 #### macOS
 
-     xcode-select --switch /Applications/Xcode.app/Contents/Developer
-     gmake install
+To build `doas`, you'll need to have Xcode Command Line Tools, and use `bison`
+instead of `byacc`:
+
+    YACC='bison -y' PREFIX=/opt/local make
+
+Alternatively, if you have Xcode.app installed, you can just:
+
+    xcode-select --switch /Applications/Xcode.app/Contents/Developer
+    make
+
+Lastly, run the following:
+
+     make install
      cp /etc/pam.d/sudo /etc/pam.d/doas
 
 Note: By default macOS blocks doas from using PAM modules, causing doas authentication to fail. The cp command above copies the sudo PAM configuration into place for doas to use.
