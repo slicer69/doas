@@ -41,11 +41,6 @@ jobs:
             clang_major_version: 16
             clang_repo_suffix: -16
             runs-on: ubuntu-22.04
-          - cc: clang-17
-            cxx: clang++-17
-            clang_major_version: 17
-            clang_repo_suffix:
-            runs-on: ubuntu-22.04
     steps:
       - name: Add Clang/LLVM repositories
         if: "${{ contains(matrix.cxx, 'clang') }}"
