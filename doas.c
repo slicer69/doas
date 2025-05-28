@@ -58,7 +58,12 @@ static struct pam_conv pamc = { misc_conv, NULL };
 
 #elif defined(SOLARIS_PAM) /* illumos & Solaris */
 #include "pm_pam_conv.h"
-static struct pam_conv pamc = { pam_tty_conv, NULL };
+// static struct pam_conv pamc = { pam_tty_conv, NULL };
+#if defined(OMNIOS_PAM)
+    static struct pam_conv pamc = { (int (*)(int, const struct pam_message **, struct pam_response **, void *))pam_tty_conv, NULL };
+#else
+    static struct pam_conv pamc = { pam_tty_conv, NULL };
+#endif
 
 #endif /* OPENPAM */
 #endif /* USE_PAM */

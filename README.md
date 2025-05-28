@@ -95,6 +95,12 @@ sudo yum install gcc gcc-c++ make flex bison pam-devel byacc git
 sudo zypper install gcc gcc-c++ make flex bison pam-devel byacc git
 ```
 
+#### OmniOS (and possibly other illumos variants)
+
+```sh
+pfexec pkg install build-essentials
+```
+
 #### macOS
 
 ```sh
@@ -130,6 +136,12 @@ Alternatively, bison can be used if yacc is not installed.
 YACC="bison -y" PREFIX=/opt/local gmake
 ```
 
+#### OmniOS
+
+```sh
+YACC="bison -y" CFLAGS+="-DOMNIOS_PAM" pfexec gmake
+```
+
 This builds the source code. Then, as the root user, run
 
 #### Linux
@@ -161,7 +173,7 @@ text editor called `/etc/pam.d/doas` and insert the following lines:
 After you save this file you may need to reboot for the change to take
 effect.
 
-#### FreeBSD, MidnightBSD and NetBSD
+#### FreeBSD, MidnightBSD, NetBSD, and OmniOS
 
 ```sh
 gmake install
