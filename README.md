@@ -139,7 +139,7 @@ YACC="bison -y" PREFIX=/opt/local gmake
 #### OmniOS
 
 ```sh
-YACC="bison -y" CFLAGS+="-DOMNIOS_PAM" pfexec gmake
+YACC="bison -y" CFLAGS+="-DOMNIOS_PAM" PREFIX=/usr pfexec gmake
 ```
 
 This builds the source code. Then, as the root user, run
