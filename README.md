@@ -1,5 +1,7 @@
 # doas - doas for every system
 
+## Please note: This project has moved to CodeBerg. The project's new repository is located at https://codeberg.org/thejessesmith/doas/
+
 A port of OpenBSD's `doas` which runs on FreeBSD, Linux, NetBSD, illumos,
 macOS and MidnightBSD.
 
